@@ -22,5 +22,14 @@
 
     <include layout="@layout/content_new_map" />
 
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_margin="16dp"
+        android:text="@string/fabText"
+        app:icon="@android:drawable/ic_menu_save" />
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
