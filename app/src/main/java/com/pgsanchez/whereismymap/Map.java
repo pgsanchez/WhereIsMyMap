@@ -11,8 +11,8 @@ public class Map {
                         // poner el nombre del mapa + el año: ElPardo2020
     // FileImage imgFile; // Imagen en pequeño del mapa. La imagen grande se guardará en GoogleDrive
 
-    String categoria;   // Categoría de la carrera. M40. Puede ser nulo
-    double distancia;   // Distancia de la carrera. Puede ser nulo
+    String category;   // Categoría de la carrera. M40. Puede ser nulo
+    double distance;   // Distancia de la carrera. Puede ser nulo
     Date mapDate;       // puede ser nulo. Pero hay que gestionarlo bien en la BD
     Date raceDate;      // puede ser nulo. Pero hay que gestionarlo bien en la BD
 
@@ -23,8 +23,8 @@ public class Map {
         latitude = 0;
         longitude = 0;
         imgFileName = "";
-        categoria = "";
-        distancia = 0;
+        category = "";
+        distance = 0;
         mapDate = null;
         raceDate = null;
     }
@@ -69,20 +69,20 @@ public class Map {
         this.imgFileName = imgFileName;
     }
 
-    public String getCategoria() {
-        return categoria;
+    public String getCategory() {
+        return category;
     }
 
-    public void setCategoria(String categoria) {
-        this.categoria = categoria;
+    public void setCategory(String category) {
+        this.category = category;
     }
 
-    public double getDistancia() {
-        return distancia;
+    public double getDistance() {
+        return distance;
     }
 
-    public void setDistancia(double distancia) {
-        this.distancia = distancia;
+    public void setDistance(double distance) {
+        this.distance = distance;
     }
 
     public Date getMapDate() {

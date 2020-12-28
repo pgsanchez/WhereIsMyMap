@@ -7,4 +7,20 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Dark Primary Color -->
+    <color name="dark_orange">#F57C00</color>
+    <!-- Light Primary Color -->
+    <color name="light_orange">#FFE0B2</color>
+    <!-- Primary Color -->
+    <color name="orange">#FF9800</color>
+    <!-- Text/Icons -->
+    <color name="primary_text">#212121</color>
+
+    <!-- Accent Color -->
+    <color name="teal">#009688</color>
+    <!-- Secondary Text -->
+    <color name="dark_gray">#757575</color>
+    <!-- Divider Color -->
+    <color name="gray">#BDBDBD</color>
 </resources>
