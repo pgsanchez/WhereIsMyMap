@@ -1,5 +1,6 @@
 package com.pgsanchez.whereismymap;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -125,8 +126,17 @@ public class DBMapRepositoryImpl implements MapRepository{
     }
 
     @Override
-    public void addMap(Map mapa) {
+    public int addMap(Map mapa) {
+        // Gets the data repository in write mode
+        SQLiteDatabase db = baseDatos.getWritableDatabase();
 
+        // Funcion de insertar.
+        if (db.insert(DBContract.MapEntry.TABLE_NAME, null, toContentValues(mapa)) == -1) {
+            // Mostrar mensaje de error
+            return -1;
+        }
+
+        return 0;
     }
 
     @Override
@@ -164,5 +174,26 @@ public class DBMapRepositoryImpl implements MapRepository{
         map.setMapDate(mapDate);
 
         return map;
+    }
+
+    public ContentValues toContentValues(Map map)
+    {
+        ContentValues values = new ContentValues();
+        values.put(DBContract.MapEntry.NAME, map.getName());
+        values.put(DBContract.MapEntry.CATEGORY, map.getCategory());
+        values.put(DBContract.MapEntry.DISTANCE, map.getDistance());
+        values.put(DBContract.MapEntry.LATITUDE, map.getLatitude());
+        values.put(DBContract.MapEntry.LONGITUDE, map.getLongitude());
+        values.put(DBContract.MapEntry.IMG_FILE_NAME, map.getImgFileName());
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String raceDate = formatter.format(map.getRaceDate());
+        values.put(DBContract.MapEntry.RACE_DATE, raceDate);
+
+        SimpleDateFormat formatter2 = new SimpleDateFormat("yyyy-MM-dd");
+        String mapDate = formatter2.format(map.getRaceDate());
+        values.put(DBContract.MapEntry.MAP_DATE, mapDate);
+
+        return values;
     }
 }

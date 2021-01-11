@@ -26,6 +26,10 @@ public class NewMapActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Snackbar.make(view, "Here's a Snackbar", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+
+                DBMapRepositoryImpl dbMapRepository = new DBMapRepositoryImpl(getApplicationContext());
+                // Se recogen los datos y se guardan en un objeto mapa
+                // Y, a continuación, se insertan en la BD
             }
         });
     }

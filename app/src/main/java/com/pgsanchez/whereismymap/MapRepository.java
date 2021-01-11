@@ -11,7 +11,7 @@ public interface MapRepository {
     Map getMapById(int id);
     List<Map> getMapsByName(String name);
 
-    void addMap(Map mapa);
+    int addMap(Map mapa);
     void updateMap(Map mapa);
     void deleteMap(Map mapa);
     void deleteMap(int id);
