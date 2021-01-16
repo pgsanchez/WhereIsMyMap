@@ -1,4 +1,6 @@
-package com.pgsanchez.whereismymap;
+package com.pgsanchez.whereismymap.repository;
+
+import com.pgsanchez.whereismymap.domain.Map;
 
 import java.util.List;
 

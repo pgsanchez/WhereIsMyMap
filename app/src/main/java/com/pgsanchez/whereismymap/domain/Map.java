@@ -1,4 +1,4 @@
-package com.pgsanchez.whereismymap;
+package com.pgsanchez.whereismymap.domain;
 
 import java.util.Date;
 
@@ -12,7 +12,7 @@ public class Map {
     // FileImage imgFile; // Imagen en pequeño del mapa. La imagen grande se guardará en GoogleDrive
 
     String category;   // Categoría de la carrera. M40. Puede ser nulo
-    double distance;   // Distancia de la carrera. Puede ser nulo
+    String distance;   // Distancia de la carrera. (media, larga, sprint) Puede ser nulo
     Date mapDate;       // puede ser nulo. Pero hay que gestionarlo bien en la BD
     Date raceDate;      // puede ser nulo. Pero hay que gestionarlo bien en la BD
 
@@ -24,7 +24,7 @@ public class Map {
         longitude = 0;
         imgFileName = "";
         category = "";
-        distance = 0;
+        distance = "";
         mapDate = null;
         raceDate = null;
     }
@@ -77,11 +77,11 @@ public class Map {
         this.category = category;
     }
 
-    public double getDistance() {
+    public String getDistance() {
         return distance;
     }
 
-    public void setDistance(double distance) {
+    public void setDistance(String distance) {
         this.distance = distance;
     }
 

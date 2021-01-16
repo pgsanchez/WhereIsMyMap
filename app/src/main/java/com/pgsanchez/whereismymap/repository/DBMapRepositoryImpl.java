@@ -1,9 +1,11 @@
-package com.pgsanchez.whereismymap;
+package com.pgsanchez.whereismymap.repository;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+
+import com.pgsanchez.whereismymap.domain.Map;
 
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
@@ -11,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class DBMapRepositoryImpl implements MapRepository{
+public class DBMapRepositoryImpl implements MapRepository {
     DBHelper baseDatos;
 
     private ArrayList<Map> mapList;
@@ -58,7 +60,7 @@ public class DBMapRepositoryImpl implements MapRepository{
                 map.setId(c.getInt(c.getColumnIndex(DBContract.MapEntry.ID_MAP)));
                 map.setName(c.getString(c.getColumnIndex(DBContract.MapEntry.NAME)));
                 map.setCategory(c.getString(c.getColumnIndex(DBContract.MapEntry.CATEGORY)));
-                map.setDistance(c.getDouble(c.getColumnIndex(DBContract.MapEntry.DISTANCE)));
+                map.setDistance(c.getString(c.getColumnIndex(DBContract.MapEntry.DISTANCE)));
                 map.setLatitude(c.getDouble(c.getColumnIndex(DBContract.MapEntry.LATITUDE)));
                 map.setLongitude(c.getDouble(c.getColumnIndex(DBContract.MapEntry.LONGITUDE)));
                 map.setImgFileName(c.getString(c.getColumnIndex(DBContract.MapEntry.IMG_FILE_NAME)));
@@ -159,7 +161,7 @@ public class DBMapRepositoryImpl implements MapRepository{
         map.setId(c.getInt(c.getColumnIndex(DBContract.MapEntry.ID_MAP)));
         map.setName(c.getString(c.getColumnIndex(DBContract.MapEntry.NAME)));
         map.setCategory(c.getString(c.getColumnIndex(DBContract.MapEntry.CATEGORY)));
-        map.setDistance(c.getDouble(c.getColumnIndex(DBContract.MapEntry.DISTANCE)));
+        map.setDistance(c.getString(c.getColumnIndex(DBContract.MapEntry.DISTANCE)));
         map.setLatitude(c.getDouble(c.getColumnIndex(DBContract.MapEntry.LATITUDE)));
         map.setLongitude(c.getDouble(c.getColumnIndex(DBContract.MapEntry.LONGITUDE)));
         map.setImgFileName(c.getString(c.getColumnIndex(DBContract.MapEntry.IMG_FILE_NAME)));

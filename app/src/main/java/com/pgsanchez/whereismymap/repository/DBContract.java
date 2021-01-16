@@ -1,4 +1,4 @@
-package com.pgsanchez.whereismymap;
+package com.pgsanchez.whereismymap.repository;
 
 import android.provider.BaseColumns;
 

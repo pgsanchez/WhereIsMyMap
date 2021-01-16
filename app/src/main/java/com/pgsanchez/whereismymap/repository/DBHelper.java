@@ -1,4 +1,4 @@
-package com.pgsanchez.whereismymap;
+package com.pgsanchez.whereismymap.repository;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -23,7 +23,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 + DBContract.MapEntry.LONGITUDE + " REAL,"
                 + DBContract.MapEntry.IMG_FILE_NAME + " TEXT,"
                 + DBContract.MapEntry.CATEGORY + " TEXT,"
-                + DBContract.MapEntry.DISTANCE + " REAL,"
+                + DBContract.MapEntry.DISTANCE + " TEXT,"
                 + DBContract.MapEntry.MAP_DATE + " DATE,"
                 + DBContract.MapEntry.RACE_DATE + " DATE)");
     }

@@ -1,4 +1,4 @@
-package com.pgsanchez.whereismymap;
+package com.pgsanchez.whereismymap.presentation;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -6,6 +6,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+
+import com.pgsanchez.whereismymap.R;
+import com.pgsanchez.whereismymap.repository.DBMapRepositoryImpl;
 
 public class MainActivity extends AppCompatActivity {
 

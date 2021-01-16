@@ -10,10 +10,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WhereIsMyMap">
         <activity
-            android:name=".NewMapActivity"
+            android:name=".presentation.NewMapActivity"
             android:label="@string/title_activity_new_map"
             android:theme="@style/Theme.WhereIsMyMap.NoActionBar"></activity>
-        <activity android:name=".MainActivity">
+        <activity android:name=".presentation.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
