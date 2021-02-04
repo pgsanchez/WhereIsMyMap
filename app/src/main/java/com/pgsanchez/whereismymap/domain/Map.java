@@ -1,8 +1,9 @@
 package com.pgsanchez.whereismymap.domain;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class Map {
+public class Map implements Serializable {
     int id;             // Id del mapa. Se asginará automáticamente. No puede ser nulo, obviamente
     String name;        // Nombre del mapa. Tampoco puede ser nulo. Las búsquedas se harán por este nombre
     double latitude;

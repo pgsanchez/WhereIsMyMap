@@ -1,7 +1,7 @@
 package com.pgsanchez.whereismymap.domain;
 
 public enum CategoryName {
-    M40, F40, M35, F35;
+    M40, F40, M35, F35, SIN_ESPECIFICAR;
 
     public static String[] getCategories() {
         String[] categories = new String[CategoryName.values().length];

@@ -8,14 +8,16 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.pgsanchez.whereismymap.R;
+import com.pgsanchez.whereismymap.domain.Map;
 import com.pgsanchez.whereismymap.repository.DBMapRepositoryImpl;
+import com.pgsanchez.whereismymap.repository.MapRepository;
 
 public class MainActivity extends AppCompatActivity {
 
     // Defines para mensajes entre Activities
     private static final int NEW_MAP_ACTIVITY = 101;
 
-    DBMapRepositoryImpl dbMapRepository;
+    MapRepository dbMapRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,10 +35,15 @@ public class MainActivity extends AppCompatActivity {
         // Posibles respuestas:
         //      1. Nuevo mapa + resultado ok
         //      2. Nuevo mapa + resultado cancel
+        Map objMap = new Map();
         if (requestCode == NEW_MAP_ACTIVITY) {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
                 // TODO: Hay que guardar el mapa en la BD
+                // Recoger el objeto NuevoMapa
+                objMap = (Map) data.getExtras().getSerializable("parametro");
+                // Guardarlo en la BD
+                //dbMapRepository.addMap(objMap);
             }
         }
 

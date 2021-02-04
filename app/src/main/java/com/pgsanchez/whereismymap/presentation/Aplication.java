@@ -13,6 +13,5 @@ public class Aplication extends Application {
     public void onCreate() {
         super.onCreate();
         mapList = new ArrayList<Map>();
-
     }
 }
