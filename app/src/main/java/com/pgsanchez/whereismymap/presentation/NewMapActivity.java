@@ -21,6 +21,7 @@ import com.pgsanchez.whereismymap.R;
 import com.pgsanchez.whereismymap.domain.CategoryName;
 import com.pgsanchez.whereismymap.domain.DistanceType;
 import com.pgsanchez.whereismymap.domain.Map;
+import com.pgsanchez.whereismymap.use_cases.UseCaseDB;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -73,6 +74,12 @@ public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallb
     // Mapa de Google Maps
     private GoogleMap mMap;
 
+    // Caso de uso para guardar el mapa en la BD
+    UseCaseDB useCaseDB;
+
+    // exitCanceling: true si salimos de esta Activity con un CANCEL
+    boolean exitCanceling = true;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +88,7 @@ public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallb
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        foto = findViewById(R.id.imageViewMap);
+        useCaseDB = new UseCaseDB(this);
 
         // El botón flotante será el de Guardar los datos
         ExtendedFloatingActionButton fab = findViewById(R.id.fab);
@@ -93,6 +100,7 @@ public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallb
 
                 // Se recogen los datos y se guardan en un objeto mapa
                 // Y, a continuación, se insertan en la BD
+                onGuardar();
             }
         });
 
@@ -142,7 +150,9 @@ public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallb
         Date date = new Date();
         TextView raceDate  = (TextView) findViewById(R.id.edtRaceDate);
         raceDate.setText(dateFormat.format(date));
-        // - que en la fecha del mapa aparezca vacía
+
+        // Se inicializa el objeto que muestra la foto
+        foto = findViewById(R.id.imageViewMap);
 
     }
 
@@ -265,7 +275,7 @@ public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallb
         mDatePicker.show();
     }
 
-    public void onGuardar(View view)
+    public void onGuardar()
     {
         /* Antes de nada hay que hacer una comprobación de que existen los datos obligatorios
         y, si no, no se permite la operación de guardar.
@@ -300,7 +310,7 @@ public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallb
         newMap.setMapDate(mapDate);
 
         // Posición (no puede ser nulo)
-        if((newMap.getLatitude() == 0.0) || (newMap.getLongitude() == 0.0)){
+        if((newMap.getLatitude() == 0.0) && (newMap.getLongitude() == 0.0)){
             Toast.makeText(this, "Introduzca localización", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -309,9 +319,12 @@ public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallb
         Si la imagen es de la galería, hay que guardarla en la carpeta de las imágenes.
         A continuación hay que guardar el nuevo mapa en la BD
          */
-        // Cerrar la Activity y devolver el objeto Repostaje con los datos
+
+        useCaseDB.insertMap(newMap);
+        exitCanceling = false;
+
+        // Cerrar la Activity y salir con OK
         Intent data = new Intent();
-        data.putExtra("parametro", newMap);
         setResult(RESULT_OK, data);
         finish();
     }
@@ -336,7 +349,7 @@ public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallb
             deleted = file.delete();
 
             if (deleted) {
-                Toast.makeText(getBaseContext(), "Imagen borrada", Toast.LENGTH_LONG).show();
+                //Toast.makeText(getBaseContext(), "Imagen borrada", Toast.LENGTH_LONG).show();
                 newMap.setImgFileName(null);
             }
         }
@@ -352,7 +365,25 @@ public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallb
             public void onMapClick(LatLng point) {
                 mMap.clear();
                 mMap.addMarker(new MarkerOptions().position(point));
+
+                newMap.setLatitude(point.latitude);
+                newMap.setLongitude(point.longitude);
             }
         });
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        /* Esta función se ejecuta al terminar la actividad, da igual si con un ok o si con un cancel*/
+        /* Lo que habría que hacer es comprobar, de alguna manera, si estamos terminando con un cancel y,
+        en ese caso, borrar la imagen que hemos guardado en la carpeta
+         */
+        if (exitCanceling){
+            if(DeleteImageMapFromPath()) {
+                Log.d("NewMapActivity:OnStop", "  OnStop");
+            }
+        }
+
     }
 }

@@ -13,7 +13,7 @@ public interface MapRepository {
     Map getMapById(int id);
     List<Map> getMapsByName(String name);
 
-    int addMap(Map mapa);
+    int insertMap(Map mapa);
     void updateMap(Map mapa);
     void deleteMap(Map mapa);
     void deleteMap(int id);

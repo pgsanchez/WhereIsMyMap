@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".presentation.EditMapActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:popupTheme="@style/Theme.WhereIsMyMap.PopupOverlay" />
+
+    <EditText
+        android:id="@+id/edtName"
+        android:layout_width="wrap_content"
+        android:layout_height="45dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="64dp"
+        android:ems="10"
+        android:hint="Nombre"
+        android:inputType="textPersonName"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageViewMap"
+        android:layout_width="179dp"
+        android:layout_height="120dp"
+        android:layout_marginTop="16dp"
+        android:contentDescription="Foto del mapa"
+        app:layout_constraintStart_toStartOf="@+id/edtName"
+        app:layout_constraintTop_toBottomOf="@+id/edtName"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <ImageButton
+        android:id="@+id/imgBtnPhoto"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:background="@color/orange"
+        android:contentDescription="Añadir foto del mapa"
+        app:layout_constraintBottom_toBottomOf="@+id/imageViewMap"
+        app:layout_constraintEnd_toEndOf="@+id/imageViewMap"
+        app:layout_constraintStart_toStartOf="@+id/imageViewMap"
+        app:layout_constraintTop_toTopOf="@+id/imageViewMap"
+        app:srcCompat="@drawable/ic_camera_outline" />
+
+    <ImageView
+        android:id="@+id/imgViewDelete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="@+id/imageViewMap"
+        app:layout_constraintTop_toTopOf="@+id/imageViewMap"
+        app:srcCompat="@android:drawable/ic_menu_delete" />
+
+    <TextView
+        android:id="@+id/tvDistance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="Distancia"
+        app:layout_constraintStart_toEndOf="@+id/imageViewMap"
+        app:layout_constraintTop_toTopOf="@+id/imageViewMap" />
+
+    <Spinner
+        android:id="@+id/spnDistance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="@+id/tvDistance"
+        app:layout_constraintTop_toBottomOf="@+id/tvDistance" />
+
+    <TextView
+        android:id="@+id/tvCategory"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Categoría"
+        app:layout_constraintStart_toStartOf="@+id/spnDistance"
+        app:layout_constraintTop_toBottomOf="@+id/spnDistance" />
+
+    <Spinner
+        android:id="@+id/spnCategory"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="@+id/tvCategory"
+        app:layout_constraintTop_toBottomOf="@+id/tvCategory" />
+
+    <TextView
+        android:id="@+id/tvRaceDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Fecha Carrera"
+        app:layout_constraintStart_toStartOf="@+id/imageViewMap"
+        app:layout_constraintTop_toBottomOf="@+id/imageViewMap" />
+
+    <ImageView
+        android:id="@+id/iconRaceDateCalendar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:contentDescription="Fecha de la carrera"
+        app:layout_constraintStart_toStartOf="@+id/tvRaceDate"
+        app:layout_constraintTop_toBottomOf="@+id/tvRaceDate"
+        app:srcCompat="@android:drawable/ic_menu_my_calendar" />
+
+    <EditText
+        android:id="@+id/edtRaceDate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:inputType="date"
+        app:layout_constraintEnd_toStartOf="@+id/iconMapDateCalendar"
+        app:layout_constraintStart_toEndOf="@+id/iconRaceDateCalendar"
+        app:layout_constraintTop_toBottomOf="@+id/tvRaceDate" />
+
+    <TextView
+        android:id="@+id/tvMapDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Fecha Mapa"
+        app:layout_constraintStart_toStartOf="@+id/spnDistance"
+        app:layout_constraintTop_toTopOf="@+id/tvRaceDate" />
+
+    <ImageView
+        android:id="@+id/iconMapDateCalendar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:contentDescription="Fecha del mapa"
+        app:layout_constraintStart_toStartOf="@+id/tvMapDate"
+        app:layout_constraintTop_toBottomOf="@+id/tvMapDate"
+        app:srcCompat="@android:drawable/ic_menu_my_calendar" />
+
+    <EditText
+        android:id="@+id/edtMapDate"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:inputType="date"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/iconMapDateCalendar"
+        app:layout_constraintTop_toBottomOf="@+id/tvMapDate" />
+
+    <fragment
+        android:id="@+id/mapFragment"
+        android:name="com.google.android.gms.maps.MapFragment"
+        android:layout_width="0dp"
+        android:layout_height="200dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edtRaceDate"
+        tools:context=".presentation.NewMapActivity" />
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

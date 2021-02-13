@@ -107,7 +107,7 @@ public class DBMapRepositoryImpl implements MapRepository {
         Cursor c = db.query(
                 DBContract.MapEntry.TABLE_NAME,                     // The table to query
                 projection,                               // The columns to return
-                DBContract.MapEntry.ID_MAP,                                // The columns for the WHERE clause
+                DBContract.MapEntry.ID_MAP + "=?",   // The columns for the WHERE clause
                 selectionArgs,                            // The values for the WHERE clause
                 null,                                     // don't group the rows
                 null,                                     // don't filter by row groups
@@ -124,11 +124,70 @@ public class DBMapRepositoryImpl implements MapRepository {
 
     @Override
     public List<Map> getMapsByName(String name) {
-        return null;
+        // Gets the data repository in write mode
+        SQLiteDatabase db = baseDatos.getReadableDatabase();
+        // Define a projection that specifies which columns from the database
+        // you will actually use after this query.
+        String[] projection = {
+                DBContract.MapEntry.ID_MAP,
+                DBContract.MapEntry.NAME,
+                DBContract.MapEntry.LATITUDE,
+                DBContract.MapEntry.LONGITUDE,
+                DBContract.MapEntry.RACE_DATE,
+                DBContract.MapEntry.MAP_DATE,
+                DBContract.MapEntry.DISTANCE,
+                DBContract.MapEntry.CATEGORY,
+                DBContract.MapEntry.IMG_FILE_NAME,
+        };
+
+        // String orderBy = DBContract.MapEntry.RACE_DATE + " ASC";
+        // Valor de la clausula WHERE (where id_map = id)
+        String[] selectionArgs = {"%" + name + "%"};
+
+        // Se puede probar con esto:
+        // Cursor c = db.rawQuery("SELECT * FROM tbl1 WHERE TRIM(name) = '"+name.trim()+"'", null);
+
+        Cursor c = db.query(
+                DBContract.MapEntry.TABLE_NAME,                     // The table to query
+                projection,                               // The columns to return
+                DBContract.MapEntry.NAME + "=?",      // The columns for the WHERE clause
+                selectionArgs,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                null                                 // The sort order
+        );
+
+        mapList.clear();
+        if (c.moveToFirst()) {
+            do {
+                Map map = new Map();
+                map.setId(c.getInt(c.getColumnIndex(DBContract.MapEntry.ID_MAP)));
+                map.setName(c.getString(c.getColumnIndex(DBContract.MapEntry.NAME)));
+                map.setCategory(c.getString(c.getColumnIndex(DBContract.MapEntry.CATEGORY)));
+                map.setDistance(c.getString(c.getColumnIndex(DBContract.MapEntry.DISTANCE)));
+                map.setLatitude(c.getDouble(c.getColumnIndex(DBContract.MapEntry.LATITUDE)));
+                map.setLongitude(c.getDouble(c.getColumnIndex(DBContract.MapEntry.LONGITUDE)));
+                map.setImgFileName(c.getString(c.getColumnIndex(DBContract.MapEntry.IMG_FILE_NAME)));
+
+                ParsePosition pos = new ParsePosition(0);
+                SimpleDateFormat simpledateformat = new SimpleDateFormat("yyyy-MM-dd");
+                Date raceDate = simpledateformat.parse(c.getString(c.getColumnIndex(DBContract.MapEntry.RACE_DATE)), pos);
+                map.setRaceDate(raceDate);
+
+                pos.setIndex(0);
+                Date mapDate = simpledateformat.parse(c.getString(c.getColumnIndex(DBContract.MapEntry.MAP_DATE)), pos);
+                map.setMapDate(mapDate);
+
+                mapList.add(map);
+
+            } while(c.moveToNext());
+        }
+
+        return mapList;
     }
 
     @Override
-    public int addMap(Map mapa) {
+    public int insertMap(Map mapa) {
         // Gets the data repository in write mode
         SQLiteDatabase db = baseDatos.getWritableDatabase();
 
@@ -193,7 +252,7 @@ public class DBMapRepositoryImpl implements MapRepository {
         values.put(DBContract.MapEntry.RACE_DATE, raceDate);
 
         SimpleDateFormat formatter2 = new SimpleDateFormat("yyyy-MM-dd");
-        String mapDate = formatter2.format(map.getRaceDate());
+        String mapDate = formatter2.format(map.getMapDate());
         values.put(DBContract.MapEntry.MAP_DATE, mapDate);
 
         return values;

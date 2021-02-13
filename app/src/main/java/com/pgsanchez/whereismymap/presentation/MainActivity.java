@@ -5,27 +5,31 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.pgsanchez.whereismymap.R;
 import com.pgsanchez.whereismymap.domain.Map;
-import com.pgsanchez.whereismymap.repository.DBMapRepositoryImpl;
+import com.pgsanchez.whereismymap.repository.DBHelper;
 import com.pgsanchez.whereismymap.repository.MapRepository;
+import com.pgsanchez.whereismymap.use_cases.UseCaseDB;
 
 public class MainActivity extends AppCompatActivity {
 
     // Defines para mensajes entre Activities
     private static final int NEW_MAP_ACTIVITY = 101;
+    private static final int EDIT_MAP_ACTIVITY = 102;
+    UseCaseDB useCaseDB;
 
-    MapRepository dbMapRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Se crea la BD y el objeto que la va a manejar.
-        dbMapRepository = new DBMapRepositoryImpl(getApplicationContext());
+        useCaseDB = new UseCaseDB(this);
     }
 
     @Override
@@ -39,12 +43,21 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == NEW_MAP_ACTIVITY) {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
-                // TODO: Hay que guardar el mapa en la BD
                 // Recoger el objeto NuevoMapa
                 objMap = (Map) data.getExtras().getSerializable("parametro");
                 // Guardarlo en la BD
-                //dbMapRepository.addMap(objMap);
+                //useCaseDB.insertMap(objMap);
+
+
+                //Iniciar actividad de edición para comprobar que los datos están bien
+                /*Intent intent = new Intent(this, EditMapActivity.class);
+                intent.putExtra("mapa", objMap);
+                startActivityForResult(intent, EDIT_MAP_ACTIVITY);*/
+            } else if (resultCode == RESULT_CANCELED){
+
             }
+
+
         }
 
     }
@@ -56,8 +69,26 @@ public class MainActivity extends AppCompatActivity {
      */
     public void onNewMap(View view) {
         Intent intent;
-
         intent = new Intent(this, NewMapActivity.class);
         startActivityForResult(intent, NEW_MAP_ACTIVITY);
+    }
+
+    /**
+     * Función a la que se llama cuando se pulsa el botón de "Buscar Mapa"
+     * @param view
+     */
+    public void onMapsList(View view){
+        //Log.d("onMapsList", ": hasta aqui");
+        EditText edtTextToFind = findViewById(R.id.edtTextToFind);
+        Intent intent;
+        intent = new Intent(this, MapsListActivity.class);
+        intent.putExtra("name", edtTextToFind.getText().toString());
+        startActivity(intent);
+
+        /*if (!edtTextToFind.getText().toString().isEmpty()){
+
+        } else{
+            // Listar todos los mapas
+        }*/
     }
 }
