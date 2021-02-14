@@ -14,9 +14,9 @@ public class UseCaseDB {
         this.actividad = actividad;
     }
 
-    public int insertMap(Map newMap){
-        int i = ((Aplication) actividad.getApplication()).dbMapRepository.insertMap(newMap);
-        return i;
+    public long insertMap(Map newMap){
+        long mapId = ((Aplication) actividad.getApplication()).dbMapRepository.insertMap(newMap);
+        return mapId;
     }
 
     public List<Map> getAllMaps(){
@@ -25,5 +25,9 @@ public class UseCaseDB {
 
     public List<Map> getMapsByName(String name){
         return ((Aplication) actividad.getApplication()).dbMapRepository.getMapsByName(name);
+    }
+
+    public Map getMapById(long idMap){
+        return ((Aplication) actividad.getApplication()).dbMapRepository.getMapById(idMap);
     }
 }

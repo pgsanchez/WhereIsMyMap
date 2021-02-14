@@ -83,7 +83,7 @@ public class DBMapRepositoryImpl implements MapRepository {
     }
 
     @Override
-    public Map getMapById(int id) {
+    public Map getMapById(long id) {
         // objeto Map que vamos a devolver
         Map map = new Map();
         // Gets the data repository in write mode
@@ -103,7 +103,7 @@ public class DBMapRepositoryImpl implements MapRepository {
         };
 
         // Valor de la clausula WHERE (where id_map = id)
-        String[] selectionArgs = {Integer.toString(id)};
+        String[] selectionArgs = {Long.toString(id)};
         Cursor c = db.query(
                 DBContract.MapEntry.TABLE_NAME,                     // The table to query
                 projection,                               // The columns to return
@@ -115,7 +115,7 @@ public class DBMapRepositoryImpl implements MapRepository {
         );
 
         // Solo debe haber un resultado
-        if (c.getCount() == 1){
+        if (c.moveToFirst()){
             map = cursorObjectToMapObject(c);
         }
 
@@ -187,17 +187,13 @@ public class DBMapRepositoryImpl implements MapRepository {
     }
 
     @Override
-    public int insertMap(Map mapa) {
+    public long insertMap(Map mapa) {
         // Gets the data repository in write mode
         SQLiteDatabase db = baseDatos.getWritableDatabase();
 
-        // Funcion de insertar.
-        if (db.insert(DBContract.MapEntry.TABLE_NAME, null, toContentValues(mapa)) == -1) {
-            // Mostrar mensaje de error
-            return -1;
-        }
-
-        return 0;
+        // Funcion de insertar. Está función devuelve el id del elemento insertado o -1 si ha habido un error. Devolvemos ese mismo valor
+        long newId = db.insert(DBContract.MapEntry.TABLE_NAME, null, toContentValues(mapa));
+        return newId;
     }
 
     @Override

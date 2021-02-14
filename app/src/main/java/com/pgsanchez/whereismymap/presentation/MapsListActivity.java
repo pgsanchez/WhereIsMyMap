@@ -57,7 +57,7 @@ public class MapsListActivity extends AppCompatActivity {
                 Log.d("pos: ", Integer.toString(pos));
                 Log.d("mapa: ", map.getName());
 
-                Y aquí habría que llamar a la ventana de edición, pasándole el mapa
+               // Y aquí habría que llamar a la ventana de edición, pasándole el mapa
             }
         });
     }

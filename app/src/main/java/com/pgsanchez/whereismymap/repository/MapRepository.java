@@ -10,10 +10,10 @@ public interface MapRepository {
     // Métodos:
 
     List<Map> getAllMaps();
-    Map getMapById(int id);
+    Map getMapById(long id);
     List<Map> getMapsByName(String name);
 
-    int insertMap(Map mapa);
+    long insertMap(Map mapa);
     void updateMap(Map mapa);
     void deleteMap(Map mapa);
     void deleteMap(int id);

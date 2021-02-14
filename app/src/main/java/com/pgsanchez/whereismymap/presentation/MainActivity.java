@@ -39,22 +39,23 @@ public class MainActivity extends AppCompatActivity {
         // Posibles respuestas:
         //      1. Nuevo mapa + resultado ok
         //      2. Nuevo mapa + resultado cancel
-        Map objMap = new Map();
+        long newMapId = -1;
         if (requestCode == NEW_MAP_ACTIVITY) {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
                 // Recoger el objeto NuevoMapa
-                objMap = (Map) data.getExtras().getSerializable("parametro");
-                // Guardarlo en la BD
-                //useCaseDB.insertMap(objMap);
-
+                newMapId = (long) data.getExtras().getSerializable("newMapId");
+                // TODO
+                // Recoger aquí el objeto Mapa con el nuevo ID y mostrar la página de Edit
 
                 //Iniciar actividad de edición para comprobar que los datos están bien
                 /*Intent intent = new Intent(this, EditMapActivity.class);
                 intent.putExtra("mapa", objMap);
                 startActivityForResult(intent, EDIT_MAP_ACTIVITY);*/
+                Log.d("MainActivity: ", "onActivityResult OK");
             } else if (resultCode == RESULT_CANCELED){
-
+                // Entra por aquí si el Insert de la BD ha fallado
+                Log.d("MainActivity: ", "onActivityResult CANCELED");
             }
 
 

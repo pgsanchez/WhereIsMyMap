@@ -320,12 +320,21 @@ public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallb
         A continuación hay que guardar el nuevo mapa en la BD
          */
 
-        useCaseDB.insertMap(newMap);
+        long newMapId = useCaseDB.insertMap(newMap);
         exitCanceling = false;
 
-        // Cerrar la Activity y salir con OK
+        // Cerrar la Activity y salir con OK y devolviendo el id del nuevo mapa
         Intent data = new Intent();
-        setResult(RESULT_OK, data);
+        if (newMapId != -1) {
+            /*data.putExtra("newMapId", newMapId);
+            setResult(RESULT_OK, data);*/
+            Intent intent;
+            intent = new Intent(this, EditMapActivity.class);
+            intent.putExtra("mapId", newMapId);
+            startActivity(intent);
+        } else {
+            setResult(RESULT_CANCELED, data);
+        }
         finish();
     }
 

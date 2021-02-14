@@ -21,6 +21,7 @@ import com.pgsanchez.whereismymap.R;
 import com.pgsanchez.whereismymap.domain.CategoryName;
 import com.pgsanchez.whereismymap.domain.DistanceType;
 import com.pgsanchez.whereismymap.domain.Map;
+import com.pgsanchez.whereismymap.use_cases.UseCaseDB;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -37,6 +38,8 @@ public class EditMapActivity extends AppCompatActivity implements OnMapReadyCall
     private Spinner distance;
     // Mapa de Google Maps
     private GoogleMap gMap;
+    // Caso de uso para guardar el mapa en la BD
+    UseCaseDB useCaseDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +48,7 @@ public class EditMapActivity extends AppCompatActivity implements OnMapReadyCall
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mapa = (Map)getIntent().getExtras().getSerializable("mapa");
+        long idMap = (long)getIntent().getExtras().getSerializable("mapId");
 
         // Se inicializa el mapa
         MapFragment mapFragment = (MapFragment) getFragmentManager()
@@ -53,7 +56,10 @@ public class EditMapActivity extends AppCompatActivity implements OnMapReadyCall
         mapFragment.getMapAsync(this);
 
         // Se establece la ruta en la que se guardarán los mapas. De momento, en la tarjeta SD
-        imgsPath = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES).getPath());
+        imgsPath = ((Aplication) getApplication()).imgsPath;
+        //imgsPath = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES).getPath());
+        useCaseDB = new UseCaseDB(this);
+        mapa = useCaseDB.getMapById(idMap);
 
         iniciarDatos();
         habilitarEdicion(false);
