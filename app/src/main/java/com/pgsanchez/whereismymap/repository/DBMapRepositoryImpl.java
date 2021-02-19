@@ -41,7 +41,7 @@ public class DBMapRepositoryImpl implements MapRepository {
                 DBContract.MapEntry.IMG_FILE_NAME,
         };
 
-        String orderBy = DBContract.MapEntry.RACE_DATE + " ASC";
+        String orderBy = DBContract.MapEntry.RACE_DATE + " DESC";
 
         Cursor c = db.query(
                 DBContract.MapEntry.TABLE_NAME,                     // The table to query
@@ -140,22 +140,26 @@ public class DBMapRepositoryImpl implements MapRepository {
                 DBContract.MapEntry.IMG_FILE_NAME,
         };
 
-        // String orderBy = DBContract.MapEntry.RACE_DATE + " ASC";
+        String orderBy = DBContract.MapEntry.RACE_DATE + " DESC";
         // Valor de la clausula WHERE (where id_map = id)
-        String[] selectionArgs = {"%" + name + "%"};
+        String[] selectionArgs = {"%" + name.toUpperCase() + "%"};
 
         // Se puede probar con esto:
         // Cursor c = db.rawQuery("SELECT * FROM tbl1 WHERE TRIM(name) = '"+name.trim()+"'", null);
+        //mDb.rawQuery("SELECT * WHERE UPPER(name) = '" + "%" + name + "%" + "'", null);
+
+
 
         Cursor c = db.query(
                 DBContract.MapEntry.TABLE_NAME,                     // The table to query
                 projection,                               // The columns to return
-                DBContract.MapEntry.NAME + "=?",      // The columns for the WHERE clause
+                DBContract.MapEntry.NAME.toUpperCase() + " LIKE ?",      // The columns for the WHERE clause
                 selectionArgs,                            // The values for the WHERE clause
                 null,                                     // don't group the rows
                 null,                                     // don't filter by row groups
-                null                                 // The sort order
+                orderBy                                 // The sort order
         );
+
 
         mapList.clear();
         if (c.moveToFirst()) {
@@ -196,19 +200,42 @@ public class DBMapRepositoryImpl implements MapRepository {
         return newId;
     }
 
+    /**
+     *
+     * @param mapa
+     * @return devuelve el número de líneas afectadas (debería ser siempre 1)
+     */
     @Override
-    public void updateMap(Map mapa) {
+    public int updateMap(Map mapa) {
+        // Gets the data repository in write mode
+        SQLiteDatabase db = baseDatos.getWritableDatabase();
 
+        String whereClause = DBContract.MapEntry.ID_MAP + "='" + mapa.getId() + "'";
+
+        int rows = db.update(DBContract.MapEntry.TABLE_NAME, toContentValues(mapa),whereClause, null);
+
+        return rows;
+    }
+
+    /**
+     *
+     * @param mapa
+     * @return devuelve el número de líneas borradas (debería ser siempre 1)
+     */
+    @Override
+    public int deleteMap(Map mapa) {
+        // Gets the data repository in write mode
+        SQLiteDatabase db = baseDatos.getWritableDatabase();
+
+        String whereClause = DBContract.MapEntry.ID_MAP + "='" + mapa.getId() + "'";
+
+        int rows = db.delete(DBContract.MapEntry.TABLE_NAME, whereClause, null);
+        return rows;
     }
 
     @Override
-    public void deleteMap(Map mapa) {
-
-    }
-
-    @Override
-    public void deleteMap(int id) {
-
+    public int deleteMap(int id) {
+        return 0;
     }
 
     Map cursorObjectToMapObject(Cursor c){

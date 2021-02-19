@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/save_option"
+        android:icon="@android:drawable/ic_menu_save"
+        android:orderInCategory="5"
+        android:title="Guardar"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/edit_option"
+        android:icon="@android:drawable/ic_menu_edit"
+        android:orderInCategory="5"
+        android:title="Editar"
+        android:visible="true"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/delete_option"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:orderInCategory="5"
+        android:title="Borrar"
+        app:showAsAction="ifRoom"/>
+
+
+
+</menu>

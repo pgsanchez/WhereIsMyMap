@@ -7,13 +7,14 @@
     tools:context=".presentation.EditMapActivity">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        android:id="@+id/toolbarEditNewMap"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
-        app:popupTheme="@style/Theme.WhereIsMyMap.PopupOverlay" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme="@style/Theme.WhereIsMyMap.PopupOverlay"
+        app:titleTextColor="@color/white" />
 
     <EditText
         android:id="@+id/edtName"
@@ -27,6 +28,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageButton
+        android:id="@+id/imgBtnPhoto"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:background="@color/orange"
+        android:contentDescription="Añadir foto del mapa"
+        android:onClick="onImgBtnPhoto"
+        app:layout_constraintBottom_toBottomOf="@+id/imageViewMap"
+        app:layout_constraintEnd_toEndOf="@+id/imageViewMap"
+        app:layout_constraintStart_toStartOf="@+id/imageViewMap"
+        app:layout_constraintTop_toTopOf="@+id/imageViewMap"
+        app:srcCompat="@drawable/ic_camera_outline" />
+
     <ImageView
         android:id="@+id/imageViewMap"
         android:layout_width="179dp"
@@ -37,22 +51,11 @@
         app:layout_constraintTop_toBottomOf="@+id/edtName"
         tools:srcCompat="@tools:sample/avatars" />
 
-    <ImageButton
-        android:id="@+id/imgBtnPhoto"
-        android:layout_width="72dp"
-        android:layout_height="72dp"
-        android:background="@color/orange"
-        android:contentDescription="Añadir foto del mapa"
-        app:layout_constraintBottom_toBottomOf="@+id/imageViewMap"
-        app:layout_constraintEnd_toEndOf="@+id/imageViewMap"
-        app:layout_constraintStart_toStartOf="@+id/imageViewMap"
-        app:layout_constraintTop_toTopOf="@+id/imageViewMap"
-        app:srcCompat="@drawable/ic_camera_outline" />
-
     <ImageView
         android:id="@+id/imgViewDelete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:onClick="DeleteMapImgage"
         app:layout_constraintEnd_toEndOf="@+id/imageViewMap"
         app:layout_constraintTop_toTopOf="@+id/imageViewMap"
         app:srcCompat="@android:drawable/ic_menu_delete" />

@@ -3,16 +3,14 @@ package com.pgsanchez.whereismymap.presentation;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
@@ -27,7 +25,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
-import androidx.documentfile.provider.DocumentFile;
 
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -42,12 +39,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.channels.FileChannel;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -85,7 +77,7 @@ public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallb
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_map);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbarEditNewMap);
         setSupportActionBar(toolbar);
 
         useCaseDB = new UseCaseDB(this);
@@ -165,22 +157,23 @@ public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallb
                 // al volver aquí, en uriUltimaFoto, tenemos la última foto tomada por la cámara y
                 // con el nombre que le hemos puesto al hacerla (wimg_1234.jpg)
 
-                // asignamos el nombre de la imagen (sin la ruta) al objeto newMap
-                newMap.setImgFileName(uriUltimaFoto.getLastPathSegment());
                 // Hay que mostrar esta imagen en la vista.
-                if (newMap.getImgFileName() != null && !newMap.getImgFileName().isEmpty()) {
+                if (uriUltimaFoto.getLastPathSegment() != null){
+                    newMap.setImgFileName(uriUltimaFoto.getLastPathSegment());
                     foto.setImageURI(Uri.parse(imgsPath + "/" + newMap.getImgFileName()));
-                } else {
+                } else{
+                    // asignamos el nombre de la imagen (cadena vacía) al objeto mapa
+                    newMap.setImgFileName("");
                     foto.setImageBitmap(null);
                 }
+
             } else {
                 Toast.makeText(this, "Error en captura" + uriUltimaFoto.toString(), Toast.LENGTH_LONG).show();
-                /* Cuando se cancela la foto, como el archivo donde se va a guardar lo hemos creado antes en uriUltimaFoto,
-                dicho archivo se guarda en la carpeta de mapas, pero estará vacío. Hay que elminarlo aquí y poner
-                uriUltimaFoto a null.*/
-                // asignamos el nombre de la imagen (sin la ruta) al objeto newMap. Si no, no lo podremos borrar.
-                newMap.setImgFileName(uriUltimaFoto.getLastPathSegment());
-                DeleteImageMapFromPath();
+                /* Cuando se cancela la foto, como el archivo donde se va a guardar lo hemos creado
+                antes en uriUltimaFoto, dicho archivo se guarda en la carpeta de mapas, pero estará vacío.
+                Hay que elminarlo aquí y poner uriUltimaFoto a null.*/
+
+                DeleteImageMapFromPath(uriUltimaFoto.getLastPathSegment());
                 // Se ponen las variables de la imagen a NULL
                 newMap.setImgFileName(null);
                 uriUltimaFoto = null;
@@ -198,7 +191,7 @@ public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallb
      * @param view
      */
     public void onImgBtnPhoto(View view){
-       try {
+        try {
             File file = File.createTempFile(
                     "wimg_" + (System.currentTimeMillis()/ 1000), ".jpg" ,
                     imgsPath);
@@ -277,11 +270,10 @@ public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallb
 
     public void onGuardar()
     {
+        exitCanceling = false;
         /* Antes de nada hay que hacer una comprobación de que existen los datos obligatorios
         y, si no, no se permite la operación de guardar.
-        Tiene que existir el nombre
-        Tiene que haber foto
-         */
+        */
 
         // Nombre (no puede ser nulo)
         EditText edtName = (EditText) findViewById(R.id.edtName);
@@ -315,59 +307,43 @@ public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallb
             return;
         }
 
-        /*
-        Si la imagen es de la galería, hay que guardarla en la carpeta de las imágenes.
-        A continuación hay que guardar el nuevo mapa en la BD
-         */
-
         long newMapId = useCaseDB.insertMap(newMap);
-        exitCanceling = false;
 
-        // Cerrar la Activity y salir con OK y devolviendo el id del nuevo mapa
-        Intent data = new Intent();
+        Intent intent;
+        intent = new Intent(this, EditMapActivity.class);
         if (newMapId != -1) {
-            /*data.putExtra("newMapId", newMapId);
-            setResult(RESULT_OK, data);*/
-            Intent intent;
-            intent = new Intent(this, EditMapActivity.class);
             intent.putExtra("mapId", newMapId);
             startActivity(intent);
         } else {
-            setResult(RESULT_CANCELED, data);
+            setResult(RESULT_CANCELED, intent);
         }
         finish();
     }
 
     public void DeleteMapImgage(View view){
-        if (DeleteImageMapFromPath()){
+        if (DeleteImageMapFromPath(newMap.getImgFileName())) {
             uriUltimaFoto = null;
             foto.setImageBitmap(null);
+            newMap.setImgFileName("");
         }
     }
 
     /**
-     * Elimina de la carpeta de mapas (imgsPath), la imagen que se encuentra guardada en el objeto
-     * newMap (newMap.getImgFileName())
+     * Elimina de la carpeta de mapas (imgsPath), la imagen que se le pasa por parámetro
      * @return TRUE en caso de que la imagen haya sido borrada. FALSE en caso contrario.
      */
-    private boolean DeleteImageMapFromPath(){
+    private boolean DeleteImageMapFromPath(String imgFileName){
         boolean deleted = false;
-        if (newMap.getImgFileName() != null && !newMap.getImgFileName().isEmpty()){
-            File file = new File(imgsPath + "/" + newMap.getImgFileName());
-
-            deleted = file.delete();
-
-            if (deleted) {
-                //Toast.makeText(getBaseContext(), "Imagen borrada", Toast.LENGTH_LONG).show();
-                newMap.setImgFileName(null);
-            }
-        }
+        File file = new File(imgsPath + "/" + imgFileName);
+        deleted = file.delete();
         return deleted;
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        LatLng madrid = new LatLng(40.41, -3.60);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(madrid, 9));
 
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
@@ -389,7 +365,8 @@ public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallb
         en ese caso, borrar la imagen que hemos guardado en la carpeta
          */
         if (exitCanceling){
-            if(DeleteImageMapFromPath()) {
+            if(!newMap.getImgFileName().isEmpty()) {
+                DeleteImageMapFromPath(newMap.getImgFileName());
                 Log.d("NewMapActivity:OnStop", "  OnStop");
             }
         }

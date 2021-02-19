@@ -35,30 +35,22 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        // Comprobar a qué activity respondemos
-        // Posibles respuestas:
-        //      1. Nuevo mapa + resultado ok
-        //      2. Nuevo mapa + resultado cancel
-        long newMapId = -1;
+        /* Comprobar a qué activity respondemos
+        *  Posibles respuestas:
+        *      1. Nuevo mapa + resultado ok
+        *      2. Nuevo mapa + resultado cancel
+        */
         if (requestCode == NEW_MAP_ACTIVITY) {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
-                // Recoger el objeto NuevoMapa
-                newMapId = (long) data.getExtras().getSerializable("newMapId");
-                // TODO
-                // Recoger aquí el objeto Mapa con el nuevo ID y mostrar la página de Edit
-
-                //Iniciar actividad de edición para comprobar que los datos están bien
-                /*Intent intent = new Intent(this, EditMapActivity.class);
-                intent.putExtra("mapa", objMap);
-                startActivityForResult(intent, EDIT_MAP_ACTIVITY);*/
                 Log.d("MainActivity: ", "onActivityResult OK");
             } else if (resultCode == RESULT_CANCELED){
-                // Entra por aquí si el Insert de la BD ha fallado
+                /* Entra por aquí si el Insert de la BD ha fallado. También entra por aquí
+                cuando vuelve desde la página de EditMapActivity, habiendo llegado a través de
+                NewMapActivity.
+                 */
                 Log.d("MainActivity: ", "onActivityResult CANCELED");
             }
-
-
         }
 
     }
@@ -79,17 +71,11 @@ public class MainActivity extends AppCompatActivity {
      * @param view
      */
     public void onMapsList(View view){
-        //Log.d("onMapsList", ": hasta aqui");
         EditText edtTextToFind = findViewById(R.id.edtTextToFind);
+        // Se llama a la ventana del listado de mapas con el texto que se desea buscar. Puede ser null.
         Intent intent;
         intent = new Intent(this, MapsListActivity.class);
         intent.putExtra("name", edtTextToFind.getText().toString());
         startActivity(intent);
-
-        /*if (!edtTextToFind.getText().toString().isEmpty()){
-
-        } else{
-            // Listar todos los mapas
-        }*/
     }
 }

@@ -30,4 +30,12 @@ public class UseCaseDB {
     public Map getMapById(long idMap){
         return ((Aplication) actividad.getApplication()).dbMapRepository.getMapById(idMap);
     }
+
+    public int updateMap(Map map){
+        return ((Aplication) actividad.getApplication()).dbMapRepository.updateMap(map);
+    }
+
+    public int deteleMap(Map map){
+        return ((Aplication) actividad.getApplication()).dbMapRepository.deleteMap(map);
+    }
 }

@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -38,26 +39,30 @@ public class MapsListActivity extends AppCompatActivity {
         }
         Log.d("mapList size = ", Integer.toString(mapList.size()));
 
-        //adaptador = ((Aplication) getApplication()).adaptador;
         adaptador = new ItemMapAdapter(mapList, ((Aplication) getApplication()).imgsPath);
         recyclerView = findViewById(R.id.mapsRecyclerView);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adaptador);
 
+        Intent intent;
+        intent = new Intent(this, EditMapActivity.class);
+
         adaptador.setOnItemClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //int itemPosition = recyclerView.getChildLayoutPosition(v);
                 // Se obtiene la posición del elemento clicado (empezando por el 0)
                 int pos = recyclerView.getChildAdapterPosition(v);
                 Map map = (Map) mapList.get(pos);
-                // int pos = (Integer)(v.getTag());
-                //Log.d("itemPosition: ", Integer.toString(itemPosition));
-                Log.d("pos: ", Integer.toString(pos));
-                Log.d("mapa: ", map.getName());
+                // Log.d("pos: ", Integer.toString(pos));
+                // Log.d("mapa: ", map.getName());
 
                // Y aquí habría que llamar a la ventana de edición, pasándole el mapa
+                // Cerrar la Activity y salir con OK y devolviendo el id del nuevo mapa
+
+                intent.putExtra("mapId", (long)-1);
+                intent.putExtra("objMap", map);
+                startActivity(intent);
             }
         });
     }
