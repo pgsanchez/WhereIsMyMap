@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -15,6 +16,8 @@ import com.pgsanchez.whereismymap.domain.Map;
 import com.pgsanchez.whereismymap.repository.DBHelper;
 import com.pgsanchez.whereismymap.repository.MapRepository;
 import com.pgsanchez.whereismymap.use_cases.UseCaseDB;
+
+import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -77,5 +80,15 @@ public class MainActivity extends AppCompatActivity {
         intent = new Intent(this, MapsListActivity.class);
         intent.putExtra("name", edtTextToFind.getText().toString());
         startActivity(intent);
+    }
+
+    public void onBtnNumFiles(View view) {
+        TextView tvNumFiles = findViewById(R.id.tvNumFiles);
+        //Defino la ruta donde busco los ficheros
+        File f = ((Aplication) getApplication()).imgsPath;
+        //Creo el array de tipo File con el contenido de la carpeta
+        File[] files = f.listFiles();
+
+        tvNumFiles.setText(Integer.toString(files.length));
     }
 }

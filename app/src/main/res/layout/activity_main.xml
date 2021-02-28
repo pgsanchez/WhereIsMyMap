@@ -42,4 +42,24 @@
         app:layout_constraintStart_toStartOf="@+id/button"
         app:layout_constraintTop_toBottomOf="@+id/button" />
 
+    <Button
+        android:id="@+id/btnNumFiles"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="92dp"
+        android:onClick="onBtnNumFiles"
+        android:text="Button"
+        app:layout_constraintStart_toStartOf="@+id/edtTextToFind"
+        app:layout_constraintTop_toBottomOf="@+id/edtTextToFind" />
+
+    <TextView
+        android:id="@+id/tvNumFiles"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:layout_marginStart="24dp"
+        android:text="TextView"
+        app:layout_constraintBottom_toBottomOf="@+id/btnNumFiles"
+        app:layout_constraintStart_toEndOf="@+id/btnNumFiles" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

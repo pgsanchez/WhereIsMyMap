@@ -428,8 +428,21 @@ public class EditMapActivity extends AppCompatActivity implements OnMapReadyCall
         // Actualizar la BD
         useCaseDB.updateMap(mapa);
         // Borrar imagen original (solo si ha cambiado)
-        if(!mapa.getImgFileName().isEmpty() && (!mapa.getImgFileName().equals(originalImage))){
+        /*if(!mapa.getImgFileName().isEmpty()) {
+            Toast.makeText(this, "Nombre de mapa no vacío. Hay que borrar imagen original", Toast.LENGTH_SHORT).show();
+        } else{
+            Toast.makeText(this, "Nombre de mapa VACIO", Toast.LENGTH_SHORT).show();
+        }
+
+        if(!mapa.getImgFileName().equals(originalImage)) {
+            Toast.makeText(this, "Nombre de mapa distino del original. Hay que borrar imagen original", Toast.LENGTH_SHORT).show();
+        } else{
+            Toast.makeText(this, "Nombre de mapa igual al original", Toast.LENGTH_SHORT).show();
+        }*/
+
+        if(!mapa.getImgFileName().isEmpty() || (!mapa.getImgFileName().equals(originalImage))){
             DeleteImageMapFromPath(originalImage);
+            Toast.makeText(this, "Imagen borrada", Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -509,10 +522,15 @@ public class EditMapActivity extends AppCompatActivity implements OnMapReadyCall
 
     private int borrarMapa(){
         Log.d("EditMapActivity: ", "borrarMapa()");
+        String imgFileName = mapa.getImgFileName();
         mapsDeleted = useCaseDB.deteleMap(mapa);
 
         if (mapsDeleted > 0) {
-            Toast.makeText(this, "Mapa borrado", Toast.LENGTH_LONG).show();
+            if (!DeleteImageMapFromPath(imgFileName)){
+                Toast.makeText(this, "Mapa borrado: LA IMAGEN NO SE HA PODIDO BORRAR", Toast.LENGTH_LONG).show();
+            } else{
+                Toast.makeText(this, "Mapa borrado - Imagen borrada", Toast.LENGTH_LONG).show();
+            }
             Intent data = new Intent();
             setResult(RESULT_OK, data);
             finish();

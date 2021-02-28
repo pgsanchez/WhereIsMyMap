@@ -110,7 +110,7 @@ public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallb
                     public void onClick(View view) { changeMapDate(); } });
 
         // Se establece la ruta en la que se guardarán los mapas. De momento, en la tarjeta SD
-        imgsPath = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES).getPath());
+        imgsPath = ((Aplication) getApplication()).imgsPath;
 
 
         iniciarDatos();
