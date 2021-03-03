@@ -91,4 +91,13 @@ public class MainActivity extends AppCompatActivity {
 
         tvNumFiles.setText(Integer.toString(files.length));
     }
+
+    public void onBtnGMap(View view) {
+        // Mostrar activity de google maps
+        Log.i("MainActivity: ", "onBtnGMap");
+        // Se llama a la ventana del listado de mapas con el texto que se desea buscar. Puede ser null.
+        Intent intent;
+        intent = new Intent(this, GMapsActivity.class);
+        startActivity(intent);
+    }
 }

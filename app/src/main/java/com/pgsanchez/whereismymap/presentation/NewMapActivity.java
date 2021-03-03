@@ -48,7 +48,6 @@ import java.util.Date;
 public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallback {
     // Defines para mensajes entre Activities
     private static final int ACTIVITY_CAMERA = 201;
-    private static final int ACTIVITY_GALLERY = 202;
 
     // Spinners para seleccionar la categoría y la distancia del nuevo mapa
     private Spinner categories;
@@ -87,18 +86,12 @@ public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallb
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Here's a Snackbar", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-
-                // Se recogen los datos y se guardan en un objeto mapa
-                // Y, a continuación, se insertan en la BD
                 onGuardar();
             }
         });
 
         // Se inicializa el mapa
-        MapFragment mapFragment = (MapFragment) getFragmentManager()
-                .findFragmentById(R.id.mapFragment);
+        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFragment);
         mapFragment.getMapAsync(this);
 
         // Se añaden dos escuchadores para los iconos de cambiar las fechas de la carrera y del mapa
@@ -111,7 +104,6 @@ public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallb
 
         // Se establece la ruta en la que se guardarán los mapas. De momento, en la tarjeta SD
         imgsPath = ((Aplication) getApplication()).imgsPath;
-
 
         iniciarDatos();
     }
@@ -134,7 +126,7 @@ public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallb
                 android.R.layout.simple_spinner_item, DistanceType.getDistances());
         adaptadorDist.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         distance.setAdapter(adaptadorDist);
-        // - y que aparezca seleccionada la primera distancia ("--")
+        // - y que aparezca seleccionada la primera distancia
         distance.setSelection(0);
 
         // - que en la fecha de carrera aparezca la fecha actual
@@ -145,7 +137,6 @@ public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallb
 
         // Se inicializa el objeto que muestra la foto
         foto = findViewById(R.id.imageViewMap);
-
     }
 
     @Override
@@ -175,7 +166,7 @@ public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallb
 
                 DeleteImageMapFromPath(uriUltimaFoto.getLastPathSegment());
                 // Se ponen las variables de la imagen a NULL
-                newMap.setImgFileName(null);
+                newMap.setImgFileName("");
                 uriUltimaFoto = null;
                 foto.setImageBitmap(null);
             }
@@ -320,6 +311,7 @@ public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallb
         finish();
     }
 
+    // Funcionalidad del botón de Borrar la imagen
     public void DeleteMapImgage(View view){
         if (DeleteImageMapFromPath(newMap.getImgFileName())) {
             uriUltimaFoto = null;

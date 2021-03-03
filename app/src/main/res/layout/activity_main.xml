@@ -2,13 +2,13 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/btnNewMap"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:onClick="onBtnGMap"
     tools:context=".presentation.MainActivity">
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/btnNewMap"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="180dp"
@@ -39,8 +39,8 @@
         android:ems="10"
         android:hint="Buscar"
         android:inputType="textPersonName"
-        app:layout_constraintStart_toStartOf="@+id/button"
-        app:layout_constraintTop_toBottomOf="@+id/button" />
+        app:layout_constraintStart_toStartOf="@+id/btnNewMap"
+        app:layout_constraintTop_toBottomOf="@+id/btnNewMap" />
 
     <Button
         android:id="@+id/btnNumFiles"
@@ -56,10 +56,20 @@
         android:id="@+id/tvNumFiles"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
         android:layout_marginStart="24dp"
+        android:layout_marginBottom="12dp"
         android:text="TextView"
         app:layout_constraintBottom_toBottomOf="@+id/btnNumFiles"
         app:layout_constraintStart_toEndOf="@+id/btnNumFiles" />
+
+    <Button
+        android:id="@+id/btnGMap"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:onClick="onBtnGMap"
+        android:text="Mapa"
+        app:layout_constraintBottom_toTopOf="@+id/btnNewMap"
+        app:layout_constraintStart_toStartOf="@+id/btnNewMap" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -339,7 +339,7 @@ public class EditMapActivity extends AppCompatActivity implements OnMapReadyCall
         }*/
     }
 
-    // 1- Funcionalidad del botón de Borrar la imagen
+    // Funcionalidad del botón de Borrar la imagen
     public void DeleteMapImgage(View view){
         if (!mapa.getImgFileName().equals(originalImage)){
             DeleteImageMapFromPath(mapa.getImgFileName());

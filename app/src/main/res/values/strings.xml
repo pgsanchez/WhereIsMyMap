@@ -5,4 +5,5 @@
     <string name="title_activity_new_map">Nuevo Mapa</string>
 
     <string name="fabText">Guardar</string>
+    <string name="title_activity_g_maps">Map</string>
 </resources>
