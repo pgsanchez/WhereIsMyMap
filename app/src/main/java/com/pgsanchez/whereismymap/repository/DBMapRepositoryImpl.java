@@ -233,11 +233,6 @@ public class DBMapRepositoryImpl implements MapRepository {
         return rows;
     }
 
-    @Override
-    public int deleteMap(int id) {
-        return 0;
-    }
-
     Map cursorObjectToMapObject(Cursor c){
         Map map = new Map();
         map.setId(c.getInt(c.getColumnIndex(DBContract.MapEntry.ID_MAP)));

@@ -1,7 +1,9 @@
 package com.pgsanchez.whereismymap.presentation;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -21,6 +23,7 @@ import com.pgsanchez.whereismymap.domain.DistanceType;
 import com.pgsanchez.whereismymap.domain.Map;
 import com.pgsanchez.whereismymap.use_cases.UseCaseDB;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -29,10 +32,13 @@ import androidx.core.content.FileProvider;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -71,7 +77,6 @@ public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallb
     // exitCanceling: true si salimos de esta Activity con un CANCEL
     boolean exitCanceling = true;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,15 +85,6 @@ public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallb
         setSupportActionBar(toolbar);
 
         useCaseDB = new UseCaseDB(this);
-
-        // El botón flotante será el de Guardar los datos
-        ExtendedFloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onGuardar();
-            }
-        });
 
         // Se inicializa el mapa
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFragment);
@@ -106,6 +102,26 @@ public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallb
         imgsPath = ((Aplication) getApplication()).imgsPath;
 
         iniciarDatos();
+        habilitarVisibilidad(true);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_new, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        switch (item.getItemId()) {
+            case R.id.save_option:
+                onGuardar();
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return true;
     }
 
     // Funcion para poner los datos por defecto en la pantalla
@@ -157,13 +173,12 @@ public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallb
                     newMap.setImgFileName("");
                     foto.setImageBitmap(null);
                 }
-
+                habilitarVisibilidad(false);
             } else {
                 Toast.makeText(this, "Error en captura" + uriUltimaFoto.toString(), Toast.LENGTH_LONG).show();
                 /* Cuando se cancela la foto, como el archivo donde se va a guardar lo hemos creado
                 antes en uriUltimaFoto, dicho archivo se guarda en la carpeta de mapas, pero estará vacío.
                 Hay que elminarlo aquí y poner uriUltimaFoto a null.*/
-
                 DeleteImageMapFromPath(uriUltimaFoto.getLastPathSegment());
                 // Se ponen las variables de la imagen a NULL
                 newMap.setImgFileName("");
@@ -210,21 +225,16 @@ public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallb
         int mYear = c.get(Calendar.YEAR);
         int mMonth = c.get(Calendar.MONTH);
         int mDay = c.get(Calendar.DAY_OF_MONTH);
-        Log.d("changeRaceDate():", "dentro.");
 
         DatePickerDialog mDatePicker;
         mDatePicker = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker datePicker, int selectedyear, int selectedmonth, int selectedday) {
-                //txtDate.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
-                Log.d("changeRaceDate():", "onDataSet.");
-
                 c.set(selectedyear, selectedmonth, selectedday);
                 newMap.setRaceDate(new Date(c.getTimeInMillis()));
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
                 TextView raceDate  = (TextView) findViewById(R.id.edtRaceDate);
                 raceDate.setText(dateFormat.format(newMap.getRaceDate()));
-                Log.d("onDataSet", dateFormat.format(newMap.getRaceDate()));
             }
         }, mYear, mMonth, mDay);
         mDatePicker.setTitle("Fecha de carrera");
@@ -240,19 +250,16 @@ public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallb
         int mYear = c.get(Calendar.YEAR);
         int mMonth = c.get(Calendar.MONTH);
         int mDay = c.get(Calendar.DAY_OF_MONTH);
-        Log.d("changeMapDate():", "dentro.");
 
         DatePickerDialog mDatePicker;
         mDatePicker = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker datePicker, int selectedyear, int selectedmonth, int selectedday) {
-                Log.d("changeRaceDate():", "onDataSet.");
                 c.set(selectedyear, selectedmonth, selectedday);
                 newMap.setMapDate(new Date(c.getTimeInMillis()));
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
                 TextView mapDate  = (TextView) findViewById(R.id.edtMapDate);
                 mapDate.setText(dateFormat.format(newMap.getMapDate()));
-                Log.d("onDataSet", dateFormat.format(newMap.getMapDate()));
             }
         }, mYear, mMonth, mDay);
         mDatePicker.setTitle("Fecha del Mapa");
@@ -318,6 +325,7 @@ public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallb
             foto.setImageBitmap(null);
             newMap.setImgFileName("");
         }
+        habilitarVisibilidad(true);
     }
 
     /**
@@ -359,9 +367,26 @@ public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallb
         if (exitCanceling){
             if(!newMap.getImgFileName().isEmpty()) {
                 DeleteImageMapFromPath(newMap.getImgFileName());
-                Log.d("NewMapActivity:OnStop", "  OnStop");
             }
         }
 
+    }
+
+    public void habilitarVisibilidad(boolean habilitar){
+
+        /* El botón de hacer la foto y el de borrarla son contrarios para la visibilidad: cuando
+        uno es visible, el otro no. El true/false que se pasa hace referencia al botón de hacer
+        la foto. El otro botón es opuesto.
+         */
+        ImageButton imgBtnPhoto = findViewById(R.id.imgBtnPhoto);
+        ImageView imgViewDelete = findViewById(R.id.imgViewDelete);
+        if (habilitar) {
+            imgBtnPhoto.setVisibility(View.VISIBLE);
+            imgViewDelete.setVisibility(View.INVISIBLE);
+
+        } else{
+            imgBtnPhoto.setVisibility(View.INVISIBLE);
+            imgViewDelete.setVisibility(View.VISIBLE);
+        }
     }
 }

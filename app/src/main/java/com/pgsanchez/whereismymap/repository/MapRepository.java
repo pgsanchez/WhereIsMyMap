@@ -16,5 +16,4 @@ public interface MapRepository {
     long insertMap(Map mapa);
     int updateMap(Map mapa);
     int deleteMap(Map mapa);
-    int deleteMap(int id);
 }

@@ -21,11 +21,7 @@ import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
 
-    // Defines para mensajes entre Activities
-    private static final int NEW_MAP_ACTIVITY = 101;
-    private static final int EDIT_MAP_ACTIVITY = 102;
     UseCaseDB useCaseDB;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,19 +39,6 @@ public class MainActivity extends AppCompatActivity {
         *      1. Nuevo mapa + resultado ok
         *      2. Nuevo mapa + resultado cancel
         */
-        if (requestCode == NEW_MAP_ACTIVITY) {
-            // Make sure the request was successful
-            if (resultCode == RESULT_OK) {
-                Log.d("MainActivity: ", "onActivityResult OK");
-            } else if (resultCode == RESULT_CANCELED){
-                /* Entra por aquí si el Insert de la BD ha fallado. También entra por aquí
-                cuando vuelve desde la página de EditMapActivity, habiendo llegado a través de
-                NewMapActivity.
-                 */
-                Log.d("MainActivity: ", "onActivityResult CANCELED");
-            }
-        }
-
     }
 
     /**
@@ -66,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     public void onNewMap(View view) {
         Intent intent;
         intent = new Intent(this, NewMapActivity.class);
-        startActivityForResult(intent, NEW_MAP_ACTIVITY);
+        startActivity(intent);
     }
 
     /**
@@ -94,8 +77,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void onBtnGMap(View view) {
         // Mostrar activity de google maps
-        Log.i("MainActivity: ", "onBtnGMap");
-        // Se llama a la ventana del listado de mapas con el texto que se desea buscar. Puede ser null.
         Intent intent;
         intent = new Intent(this, GMapsActivity.class);
         startActivity(intent);

@@ -98,31 +98,33 @@ public class EditMapActivity extends AppCompatActivity implements OnMapReadyCall
                 new View.OnClickListener() {
                     public void onClick(View view) { changeMapDate(); } });
 
-        /* A esta ventana se llega por 2 caminos:
+        /* A esta ventana se llega por 3 caminos:
         - Desde la ventana de NewMapActivity: en este caso, en el parámetro mapId llegará el id del nuevo mapa,
         que será un valor > -1. Además, en este caso, en el parámetro "mapa" llegará un objeto vacío, así que
         no lo recogemos.
         - Desde la lista de mapas: En este caso, en el parámetro mapId llegará un valor -1 y en el parámetro
         "mapa" llegará el objeto mapa que hay que mostrar.
+        - Desde la ventana de google maps: este caso es igual que el anterior, en el parámetro mapId llegará un valor -1
+        y en el parámetro "mapa" llegará el objeto mapa que hay que mostrar.
          */
         long idMap = (long)getIntent().getExtras().getSerializable("mapId");
         if (idMap > -1){
             // Venimos desde la ventana de NewMapActivity
             mapa = useCaseDB.getMapById(idMap);
         } else{
-            // Venimos de la lista de mapas
+            // Venimos de la lista de mapas o de google maps
             mapa = (Map)getIntent().getExtras().getSerializable("objMap");
         }
 
         originalImage = mapa.getImgFileName();
 
         iniciarDatos();
-        habilitarVisibilidad(false);
+        habilitarVisibilidadBtnPhoto(false);
+        habilitarVisibilidadDeleteImg(false);
         habilitarEdicion(false);
 
         // Se inicializa el mapa
-        MapFragment mapFragment = (MapFragment) getFragmentManager()
-                .findFragmentById(R.id.mapFragment);
+        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFragment);
         mapFragment.getMapAsync(this);
     }
 
@@ -146,15 +148,15 @@ public class EditMapActivity extends AppCompatActivity implements OnMapReadyCall
             case R.id.edit_option:
                 editMode = true;
                 this.invalidateOptionsMenu();
-                habilitarVisibilidad(true);
+                if (!mapa.getImgFileName().isEmpty()) {
+                    habilitarVisibilidadBtnPhoto(true);
+                } else {
+                    habilitarVisibilidadDeleteImg(true);
+                }
                 habilitarEdicion(true);
                 break;
             case R.id.save_option:
                 onGuardarCambios();
-                editMode = false;
-                this.invalidateOptionsMenu();
-                habilitarVisibilidad(false);
-                habilitarEdicion(false);
                 break;
             case R.id.delete_option:
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -171,12 +173,11 @@ public class EditMapActivity extends AppCompatActivity implements OnMapReadyCall
                 AlertDialog dialog = builder.create();
                 dialog.show();
 
-
-                    editMode = false;
-                    this.invalidateOptionsMenu();
-                    habilitarVisibilidad(false);
-                    habilitarEdicion(false);
-
+                editMode = false;
+                this.invalidateOptionsMenu();
+                habilitarVisibilidadBtnPhoto(false);
+                habilitarVisibilidadDeleteImg(false);
+                habilitarEdicion(false);
 
                 break;
             default:
@@ -199,6 +200,8 @@ public class EditMapActivity extends AppCompatActivity implements OnMapReadyCall
                     // asignamos el nombre de la imagen (sin la ruta) al objeto mapa
                     mapa.setImgFileName(uriUltimaFoto.getLastPathSegment());
                     foto.setImageURI(Uri.parse(imgsPath + "/" + mapa.getImgFileName()));
+                    habilitarVisibilidadBtnPhoto(false);
+                    habilitarVisibilidadDeleteImg(true);
                 } else{
                         // asignamos el nombre de la imagen (cadena vacía) al objeto mapa
                     mapa.setImgFileName("");
@@ -273,8 +276,6 @@ public class EditMapActivity extends AppCompatActivity implements OnMapReadyCall
         // Fecha del mapa
         TextView mapDate  = (TextView) findViewById(R.id.edtMapDate);
         mapDate.setText(dateFormat.format(mapa.getMapDate()));
-
-
     }
 
     @Override
@@ -308,9 +309,6 @@ public class EditMapActivity extends AppCompatActivity implements OnMapReadyCall
         ImageView iconMapDateCalendar = findViewById(R.id.iconMapDateCalendar);
         ImageButton imgBtnPhoto = findViewById(R.id.imgBtnPhoto);
 
-        // El mapa se tiene que poder "utilizar" (mover, zoom). Lo que hay que controlar con esta
-        // función es que haga caso, o no, a las pulsaciones para cambiar la posición
-
         name.setEnabled(habilitar);
         distance.setEnabled(habilitar);
         categories.setEnabled(habilitar);
@@ -322,21 +320,22 @@ public class EditMapActivity extends AppCompatActivity implements OnMapReadyCall
         imgBtnPhoto.setEnabled(habilitar);
     }
 
-    public void habilitarVisibilidad(boolean habilitar){
-
+    public void habilitarVisibilidadDeleteImg(boolean habilitar){
         ImageView imgViewDelete = findViewById(R.id.imgViewDelete);
         if (habilitar) {
             imgViewDelete.setVisibility(View.VISIBLE);
         } else{
             imgViewDelete.setVisibility(View.INVISIBLE);
         }
+    }
 
-        /*ImageButton imgBtnPhoto = findViewById(R.id.imgBtnPhoto);
-        if (mapa.getImgFileName() != null && !mapa.getImgFileName().isEmpty()) {
-            imgBtnPhoto.setVisibility(View.INVISIBLE);
-        } else {
-            imgBtnPhoto.setVisibility(View.VISIBLE);
-        }*/
+    public void habilitarVisibilidadBtnPhoto(boolean habilitar){
+        ImageButton imgBtnPhoto = findViewById(R.id.imgBtnPhoto);
+        if (habilitar) {
+            imgBtnPhoto.setVisibility((View.VISIBLE));
+        } else{
+            imgBtnPhoto.setVisibility((View.INVISIBLE));
+        }
     }
 
     // Funcionalidad del botón de Borrar la imagen
@@ -347,6 +346,9 @@ public class EditMapActivity extends AppCompatActivity implements OnMapReadyCall
         uriUltimaFoto = null;
         foto.setImageBitmap(null);
         mapa.setImgFileName("");
+
+        habilitarVisibilidadBtnPhoto(true);
+        habilitarVisibilidadDeleteImg(false);
     }
 
     /**
@@ -360,7 +362,7 @@ public class EditMapActivity extends AppCompatActivity implements OnMapReadyCall
         return deleted;
     }
 
-    // 2- Funcionalidad de hacer nueva foto
+    // Funcionalidad de hacer nueva foto
     /**
      * Se llama a esta función desde el bótón de la "cámara" de la actividad.
      * Se crea un fichero para guardar la imagen que se va a tomar con la cámara.
@@ -388,8 +390,7 @@ public class EditMapActivity extends AppCompatActivity implements OnMapReadyCall
         }
     }
 
-    // 3- Funcionalidad de los "combos" de seleccionar las fechas
-    // 4- Funcionalidad de Guardar los datos y actualizar la BD
+    // Funcionalidad de Guardar los datos y actualizar la BD
     public void onGuardarCambios(){
         exitCanceling = false;
 
@@ -427,24 +428,30 @@ public class EditMapActivity extends AppCompatActivity implements OnMapReadyCall
 
         // Actualizar la BD
         useCaseDB.updateMap(mapa);
-        // Borrar imagen original (solo si ha cambiado)
-        /*if(!mapa.getImgFileName().isEmpty()) {
-            Toast.makeText(this, "Nombre de mapa no vacío. Hay que borrar imagen original", Toast.LENGTH_SHORT).show();
-        } else{
-            Toast.makeText(this, "Nombre de mapa VACIO", Toast.LENGTH_SHORT).show();
+
+        if(!mapa.getImgFileName().isEmpty()){
+            if (originalImage.isEmpty()){
+                /* Si salimos, y no hay imagen en el mapa, y sí había una imagen original,
+                   es que la hemos borrado --> eliminar la imagen original de la carpeta
+                */
+                DeleteImageMapFromPath(originalImage);
+                Toast.makeText(this, "Imagen original borrada", Toast.LENGTH_SHORT).show();
+            }
+
+        } else {
+            if (!mapa.getImgFileName().equals(originalImage)){
+                /* si salimos y tenemos un nombre de imagen que NO coincide con el nombre de imagen original
+                   será que la hemos cambiado --> eliminar la imagen original de la carpeta
+                 */
+                DeleteImageMapFromPath(originalImage);
+                Toast.makeText(this, "Imagen original borrada", Toast.LENGTH_SHORT).show();
+            }
         }
 
-        if(!mapa.getImgFileName().equals(originalImage)) {
-            Toast.makeText(this, "Nombre de mapa distino del original. Hay que borrar imagen original", Toast.LENGTH_SHORT).show();
-        } else{
-            Toast.makeText(this, "Nombre de mapa igual al original", Toast.LENGTH_SHORT).show();
-        }*/
-
-        if(!mapa.getImgFileName().isEmpty() || (!mapa.getImgFileName().equals(originalImage))){
-            DeleteImageMapFromPath(originalImage);
-            Toast.makeText(this, "Imagen borrada", Toast.LENGTH_SHORT).show();
-        }
-
+        // Cerrar la Activity
+        Intent data = new Intent();
+        setResult(RESULT_OK, data);
+        finish();
     }
 
     @Override
@@ -457,7 +464,6 @@ public class EditMapActivity extends AppCompatActivity implements OnMapReadyCall
         if (exitCanceling){
             if(!mapa.getImgFileName().isEmpty() && (!mapa.getImgFileName().equals(originalImage))) {
                 DeleteImageMapFromPath(mapa.getImgFileName());
-                Log.d("NewMapActivity:OnStop", "  OnStop");
             }
         }
     }
@@ -471,21 +477,16 @@ public class EditMapActivity extends AppCompatActivity implements OnMapReadyCall
         int mYear = c.get(Calendar.YEAR);
         int mMonth = c.get(Calendar.MONTH);
         int mDay = c.get(Calendar.DAY_OF_MONTH);
-        Log.d("changeRaceDate():", "dentro.");
 
         DatePickerDialog mDatePicker;
         mDatePicker = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker datePicker, int selectedyear, int selectedmonth, int selectedday) {
-                //txtDate.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
-                Log.d("changeRaceDate():", "onDataSet.");
-
                 c.set(selectedyear, selectedmonth, selectedday);
                 mapa.setRaceDate(new Date(c.getTimeInMillis()));
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
                 TextView raceDate  = (TextView) findViewById(R.id.edtRaceDate);
                 raceDate.setText(dateFormat.format(mapa.getRaceDate()));
-                Log.d("onDataSet", dateFormat.format(mapa.getRaceDate()));
             }
         }, mYear, mMonth, mDay);
         mDatePicker.setTitle("Fecha de carrera");
@@ -501,19 +502,16 @@ public class EditMapActivity extends AppCompatActivity implements OnMapReadyCall
         int mYear = c.get(Calendar.YEAR);
         int mMonth = c.get(Calendar.MONTH);
         int mDay = c.get(Calendar.DAY_OF_MONTH);
-        Log.d("changeMapDate():", "dentro.");
 
         DatePickerDialog mDatePicker;
         mDatePicker = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker datePicker, int selectedyear, int selectedmonth, int selectedday) {
-                Log.d("changeRaceDate():", "onDataSet.");
                 c.set(selectedyear, selectedmonth, selectedday);
                 mapa.setMapDate(new Date(c.getTimeInMillis()));
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
                 TextView mapDate  = (TextView) findViewById(R.id.edtMapDate);
                 mapDate.setText(dateFormat.format(mapa.getMapDate()));
-                Log.d("onDataSet", dateFormat.format(mapa.getMapDate()));
             }
         }, mYear, mMonth, mDay);
         mDatePicker.setTitle("Fecha del Mapa");
@@ -521,7 +519,6 @@ public class EditMapActivity extends AppCompatActivity implements OnMapReadyCall
     }
 
     private int borrarMapa(){
-        Log.d("EditMapActivity: ", "borrarMapa()");
         String imgFileName = mapa.getImgFileName();
         mapsDeleted = useCaseDB.deteleMap(mapa);
 

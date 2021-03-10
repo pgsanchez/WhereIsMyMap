@@ -10,7 +10,6 @@ public class Map implements Serializable {
     double longitude;   // Coordenadas para geo-localizar el mapa. Puede ser 0, si no se sabe las coordenadas (que habrá alguno antiguo que no las sepa)
     String imgFileName; // Nombre del fichero de imagen del mapa. Tampoco puede ser nulo. Hay que cambiarle el nombre para que no se pueda repetir. Quizá como nombre del fichero se podría
                         // poner el nombre del mapa + el año: ElPardo2020
-    // FileImage imgFile; // Imagen en pequeño del mapa. La imagen grande se guardará en GoogleDrive
 
     String category;   // Categoría de la carrera. M40. Puede ser nulo
     String distance;   // Distancia de la carrera. (media, larga, sprint) Puede ser nulo
