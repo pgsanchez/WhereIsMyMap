@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -167,7 +168,13 @@ public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallb
                 // Hay que mostrar esta imagen en la vista.
                 if (uriUltimaFoto.getLastPathSegment() != null){
                     newMap.setImgFileName(uriUltimaFoto.getLastPathSegment());
-                    foto.setImageURI(Uri.parse(imgsPath + "/" + newMap.getImgFileName()));
+                    //foto.setImageURI(Uri.parse(imgsPath + "/" + newMap.getImgFileName()));
+                    //File tmpFile = new File(imgsPath + "/" + newMap.getImgFileName());
+                    Glide.with(this)
+                            .load(uriUltimaFoto)
+                            .override(120, 120)
+                            .into(foto);
+
                 } else{
                     // asignamos el nombre de la imagen (cadena vacía) al objeto mapa
                     newMap.setImgFileName("");

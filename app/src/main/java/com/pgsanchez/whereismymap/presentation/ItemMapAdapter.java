@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.pgsanchez.whereismymap.R;
 import com.pgsanchez.whereismymap.domain.Map;
 
@@ -41,7 +42,13 @@ public class ItemMapAdapter extends RecyclerView.Adapter<ItemMapAdapter.ViewHold
         }
 
         public void personaliza(Map myMap, File imgsPath){
-            imageMap.setImageURI(Uri.parse(imgsPath + "/" + myMap.getImgFileName()));
+            //imageMap.setImageURI(Uri.parse(imgsPath + "/" + myMap.getImgFileName()));
+            File tmp = new File(imgsPath + "/" + myMap.getImgFileName());
+            Glide.with(imageMap)
+                    .load(tmp)
+                    .override(120, 120)
+                    .into(imageMap);
+
             //imageMap.setImageURI(null);
             tvNameItem.setText(myMap.getName());
             tvDistanceItem.setText(myMap.getDistance());

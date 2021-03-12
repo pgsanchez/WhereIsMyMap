@@ -39,7 +39,22 @@ public class MapsListActivity extends AppCompatActivity {
 
         mapList = new ArrayList<Map>();
         textToFind = (String)getIntent().getExtras().getString("name");
-        cargarLista();
+        if (textToFind.isEmpty()) {
+            mapList = useCaseDB.getAllMaps();
+        } else {
+            mapList = useCaseDB.getMapsByName(textToFind);
+        }
+        adaptador = new ItemMapAdapter(mapList, ((Aplication) getApplication()).imgsPath);
+        recyclerView = findViewById(R.id.mapsRecyclerView);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(adaptador);
+        DividerItemDecoration mDividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
+                DividerItemDecoration.VERTICAL);
+        mDividerItemDecoration.setDrawable(getResources().getDrawable(R.drawable.ic_line_divider_list));
+        recyclerView.addItemDecoration(mDividerItemDecoration);
+
+
 
         Intent intent;
         intent = new Intent(this, EditMapActivity.class);
@@ -49,6 +64,7 @@ public class MapsListActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // Se obtiene la posición del elemento clicado (empezando por el 0)
                 int pos = recyclerView.getChildAdapterPosition(v);
+                Log.d("MapsList:onClick: ", "position " + Integer.toString(pos));
                 Map map = (Map) mapList.get(pos);
 
                 // Se llama a la ventana de edición, pasándole el mapa
@@ -77,15 +93,6 @@ public class MapsListActivity extends AppCompatActivity {
         } else {
             mapList = useCaseDB.getMapsByName(textToFind);
         }
-
-        adaptador = new ItemMapAdapter(mapList, ((Aplication) getApplication()).imgsPath);
-        recyclerView = findViewById(R.id.mapsRecyclerView);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(adaptador);
-        DividerItemDecoration mDividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
-                DividerItemDecoration.VERTICAL);
-        mDividerItemDecoration.setDrawable(getResources().getDrawable(R.drawable.ic_line_divider_list));
-        recyclerView.addItemDecoration(mDividerItemDecoration);
+        adaptador.notifyDataSetChanged();
     }
 }

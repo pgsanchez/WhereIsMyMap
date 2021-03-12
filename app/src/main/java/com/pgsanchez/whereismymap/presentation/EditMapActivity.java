@@ -29,6 +29,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -97,6 +98,10 @@ public class EditMapActivity extends AppCompatActivity implements OnMapReadyCall
         findViewById(R.id.iconMapDateCalendar).setOnClickListener(
                 new View.OnClickListener() {
                     public void onClick(View view) { changeMapDate(); } });
+
+        findViewById(R.id.imageViewMap).setOnClickListener(
+                new View.OnClickListener() {
+                    public void onClick(View view) { viewImageMap(); } });
 
         /* A esta ventana se llega por 3 caminos:
         - Desde la ventana de NewMapActivity: en este caso, en el parámetro mapId llegará el id del nuevo mapa,
@@ -199,7 +204,11 @@ public class EditMapActivity extends AppCompatActivity implements OnMapReadyCall
                 if (uriUltimaFoto.getLastPathSegment() != null){
                     // asignamos el nombre de la imagen (sin la ruta) al objeto mapa
                     mapa.setImgFileName(uriUltimaFoto.getLastPathSegment());
-                    foto.setImageURI(Uri.parse(imgsPath + "/" + mapa.getImgFileName()));
+                    //foto.setImageURI(Uri.parse(imgsPath + "/" + mapa.getImgFileName()));
+                    Glide.with(this)
+                            .load(uriUltimaFoto)
+                            .override(120, 120)
+                            .into(foto);
                     habilitarVisibilidadBtnPhoto(false);
                     habilitarVisibilidadDeleteImg(true);
                 } else{
@@ -235,7 +244,12 @@ public class EditMapActivity extends AppCompatActivity implements OnMapReadyCall
         // Foto del mapa
         foto = findViewById(R.id.imageViewMap);
         if (mapa.getImgFileName() != null && !mapa.getImgFileName().isEmpty()) {
-            foto.setImageURI(Uri.parse(imgsPath + "/" + mapa.getImgFileName()));
+            //foto.setImageURI(Uri.parse(imgsPath + "/" + mapa.getImgFileName()));
+            File tmp = new File(imgsPath + "/" + mapa.getImgFileName());
+            Glide.with(this)
+                    .load(tmp)
+                    .override(120, 120)
+                    .into(foto);
             // Y se oculta el botón de hacer fotos
         } else {
             foto.setImageBitmap(null);
@@ -275,7 +289,11 @@ public class EditMapActivity extends AppCompatActivity implements OnMapReadyCall
 
         // Fecha del mapa
         TextView mapDate  = (TextView) findViewById(R.id.edtMapDate);
-        mapDate.setText(dateFormat.format(mapa.getMapDate()));
+        if (mapa.getMapDate() != null) {
+            mapDate.setText(dateFormat.format(mapa.getMapDate()));
+        } else {
+            mapDate.setText("");
+        }
     }
 
     @Override
@@ -536,5 +554,14 @@ public class EditMapActivity extends AppCompatActivity implements OnMapReadyCall
         }
 
         return mapsDeleted;
+    }
+
+    private void viewImageMap(){
+        Log.d("viewImageMap", "pulsado");
+        Intent intent;
+        intent = new Intent(this, MapView.class);
+        // Se llama a la ventana de edición, pasándole el mapa
+        intent.putExtra("mapName", mapa.getImgFileName());
+        startActivity(intent);
     }
 }

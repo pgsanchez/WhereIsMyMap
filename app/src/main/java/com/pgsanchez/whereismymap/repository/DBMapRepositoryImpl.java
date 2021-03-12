@@ -57,7 +57,8 @@ public class DBMapRepositoryImpl implements MapRepository {
         if (c.moveToFirst()) {
             do {
                 Map map = new Map();
-                map.setId(c.getInt(c.getColumnIndex(DBContract.MapEntry.ID_MAP)));
+                map = cursorObjectToMapObject(c);
+                /*map.setId(c.getInt(c.getColumnIndex(DBContract.MapEntry.ID_MAP)));
                 map.setName(c.getString(c.getColumnIndex(DBContract.MapEntry.NAME)));
                 map.setCategory(c.getString(c.getColumnIndex(DBContract.MapEntry.CATEGORY)));
                 map.setDistance(c.getString(c.getColumnIndex(DBContract.MapEntry.DISTANCE)));
@@ -72,7 +73,7 @@ public class DBMapRepositoryImpl implements MapRepository {
 
                 pos.setIndex(0);
                 Date mapDate = simpledateformat.parse(c.getString(c.getColumnIndex(DBContract.MapEntry.MAP_DATE)), pos);
-                map.setMapDate(mapDate);
+                map.setMapDate(mapDate);*/
 
                 mapList.add(map);
 
@@ -165,7 +166,8 @@ public class DBMapRepositoryImpl implements MapRepository {
         if (c.moveToFirst()) {
             do {
                 Map map = new Map();
-                map.setId(c.getInt(c.getColumnIndex(DBContract.MapEntry.ID_MAP)));
+                map = cursorObjectToMapObject(c);
+                /*map.setId(c.getInt(c.getColumnIndex(DBContract.MapEntry.ID_MAP)));
                 map.setName(c.getString(c.getColumnIndex(DBContract.MapEntry.NAME)));
                 map.setCategory(c.getString(c.getColumnIndex(DBContract.MapEntry.CATEGORY)));
                 map.setDistance(c.getString(c.getColumnIndex(DBContract.MapEntry.DISTANCE)));
@@ -180,7 +182,7 @@ public class DBMapRepositoryImpl implements MapRepository {
 
                 pos.setIndex(0);
                 Date mapDate = simpledateformat.parse(c.getString(c.getColumnIndex(DBContract.MapEntry.MAP_DATE)), pos);
-                map.setMapDate(mapDate);
+                map.setMapDate(mapDate);*/
 
                 mapList.add(map);
 
@@ -249,8 +251,10 @@ public class DBMapRepositoryImpl implements MapRepository {
         map.setRaceDate(raceDate);
 
         pos.setIndex(0);
-        Date mapDate = simpledateformat.parse(c.getString(c.getColumnIndex(DBContract.MapEntry.MAP_DATE)), pos);
-        map.setMapDate(mapDate);
+        if (c.getType(c.getColumnIndex(DBContract.MapEntry.MAP_DATE)) != Cursor.FIELD_TYPE_NULL) {
+            Date mapDate = simpledateformat.parse(c.getString(c.getColumnIndex(DBContract.MapEntry.MAP_DATE)), pos);
+            map.setMapDate(mapDate);
+        }
 
         return map;
     }
@@ -270,8 +274,13 @@ public class DBMapRepositoryImpl implements MapRepository {
         values.put(DBContract.MapEntry.RACE_DATE, raceDate);
 
         SimpleDateFormat formatter2 = new SimpleDateFormat("yyyy-MM-dd");
-        String mapDate = formatter2.format(map.getMapDate());
-        values.put(DBContract.MapEntry.MAP_DATE, mapDate);
+        if (map.getMapDate() != null){
+            String mapDate = formatter2.format(map.getMapDate());
+            values.put(DBContract.MapEntry.MAP_DATE, mapDate);
+        } else{
+            values.putNull(DBContract.MapEntry.MAP_DATE);
+        }
+
 
         return values;
     }
