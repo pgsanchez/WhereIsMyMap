@@ -10,65 +10,69 @@
         android:id="@+id/btnNewMap"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="180dp"
+        android:layout_marginTop="240dp"
+        android:drawableLeft="@drawable/ic_map_plus"
         android:onClick="onNewMap"
         android:text="@string/btnNewMap"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="HardcodedText" />
-
-    <ImageButton
-        android:id="@+id/imgBtnSearch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:background="@color/orange"
-        android:onClick="onMapsList"
-        app:layout_constraintStart_toEndOf="@+id/edtTextToFind"
-        app:layout_constraintTop_toTopOf="@+id/edtTextToFind"
-        app:srcCompat="@android:drawable/ic_menu_search" />
 
     <EditText
         android:id="@+id/edtTextToFind"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="128dp"
         android:ems="10"
         android:hint="Buscar"
         android:inputType="textPersonName"
-        app:layout_constraintStart_toStartOf="@+id/btnNewMap"
-        app:layout_constraintTop_toBottomOf="@+id/btnNewMap" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/btnNumFiles"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="92dp"
+        android:layout_marginTop="200dp"
         android:onClick="onBtnNumFiles"
-        android:text="Button"
-        app:layout_constraintStart_toStartOf="@+id/edtTextToFind"
-        app:layout_constraintTop_toBottomOf="@+id/edtTextToFind" />
+        android:text="Check"
+        app:layout_constraintStart_toStartOf="@+id/btnGMap"
+        app:layout_constraintTop_toBottomOf="@+id/btnGMap" />
 
     <TextView
         android:id="@+id/tvNumFiles"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginBottom="12dp"
+        android:layout_marginStart="28dp"
+        android:layout_marginBottom="8dp"
         android:text="TextView"
         app:layout_constraintBottom_toBottomOf="@+id/btnNumFiles"
         app:layout_constraintStart_toEndOf="@+id/btnNumFiles" />
 
     <Button
         android:id="@+id/btnGMap"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+        android:layout_marginTop="32dp"
+        android:drawableLeft="@drawable/ic_map_marker"
         android:onClick="onBtnGMap"
-        android:text="Mapa"
-        app:layout_constraintBottom_toTopOf="@+id/btnNewMap"
-        app:layout_constraintStart_toStartOf="@+id/btnNewMap" />
+        android:text="Explorar"
+        app:layout_constraintEnd_toEndOf="@+id/btnNewMap"
+        app:layout_constraintStart_toStartOf="@+id/btnNewMap"
+        app:layout_constraintTop_toBottomOf="@+id/btnNewMap" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="55dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:drawableLeft="@drawable/ic_magnify"
+        android:onClick="onMapsList"
+        app:layout_constraintBottom_toBottomOf="@+id/edtTextToFind"
+        app:layout_constraintStart_toEndOf="@+id/edtTextToFind"
+        app:layout_constraintTop_toTopOf="@+id/edtTextToFind" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

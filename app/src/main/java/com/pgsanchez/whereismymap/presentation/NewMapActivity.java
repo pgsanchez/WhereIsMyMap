@@ -1,10 +1,13 @@
 package com.pgsanchez.whereismymap.presentation;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -28,6 +31,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 
 import android.os.Environment;
@@ -55,6 +59,7 @@ import java.util.Date;
 public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallback {
     // Defines para mensajes entre Activities
     private static final int ACTIVITY_CAMERA = 201;
+    private static final int PERMISSIONS_REQUEST = 202;
 
     // Spinners para seleccionar la categoría y la distancia del nuevo mapa
     private Spinner categories;
@@ -204,6 +209,59 @@ public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallb
      * @param view
      */
     public void onImgBtnPhoto(View view){
+        String[] PERMISSIONS = {
+                android.Manifest.permission.CAMERA,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+        };
+
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (!hasAllPermissions(PERMISSIONS)) {
+                ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSIONS_REQUEST);
+            } else {
+                takePhoto();
+            }
+        }
+        else { //permission is automatically granted on sdk<23 upon installation
+            Log.v("permisos", "Permission is granted");
+        }
+    }
+
+    public boolean hasAllPermissions(String[] permissions) {
+        if (permissions != null) {
+            for (String permission : permissions) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST:
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 1){
+                    if ((grantResults[0] == PackageManager.PERMISSION_GRANTED) && (grantResults[1] == PackageManager.PERMISSION_GRANTED))
+                        // Permission is granted. Continue the action or workflow
+                        // in your app.
+                        Log.i("permissionsResult", "All permissions granted");
+                } else {
+                    Log.i("permissionsResult", "NOT All permissions granted");
+                }
+                break;
+            default:
+                break;
+        }
+        // Other 'case' lines to check for other
+        // permissions this app might request.
+    }
+
+
+    private void takePhoto(){
         try {
             File file = File.createTempFile(
                     "wimg_" + (System.currentTimeMillis()/ 1000), ".jpg" ,
@@ -222,7 +280,6 @@ public class NewMapActivity extends AppCompatActivity implements OnMapReadyCallb
                     Toast.LENGTH_LONG).show();
         }
     }
-
     /**
      * La función changeRaceDate es la encargada de mostrar el diálogo para cambiar la fecha de
      * la carrera, recoger la nueva fecha y mostrarla en el editText de dicha fecha.
