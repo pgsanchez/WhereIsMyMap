@@ -3,11 +3,9 @@ package com.pgsanchez.whereismymap.presentation;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
+import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -16,30 +14,30 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.drive.Drive;
-import com.google.android.gms.drive.DriveApi;
-import com.google.android.gms.drive.DriveContents;
-import com.google.android.gms.drive.DriveFolder;
-import com.google.android.gms.drive.MetadataChangeSet;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.Scope;
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.DriveScopes;
 import com.pgsanchez.whereismymap.R;
 import com.pgsanchez.whereismymap.use_cases.UseCaseDB;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.util.Collections;
 
 
-public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
+public class MainActivity extends AppCompatActivity {
 
     UseCaseDB useCaseDB;
 
-    private GoogleApiClient apiClient;
+    private static final String TAG = "MainActivity";
+    private static final int REQUEST_CODE_SIGN_IN = 1;
+    private DriveServiceHelper mDriveServiceHelper;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,8 +56,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
+
         switch (item.getItemId()) {
+            case R.id.login_option:
+                login();
+                break;
             case R.id.export_option:
                 exportar();
                 break;
@@ -73,12 +74,16 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        switch (requestCode) {
+            case REQUEST_CODE_SIGN_IN:
+                if (resultCode == Activity.RESULT_OK && data != null) {
+                    handleSignInResult(data);
+                }
+                break;
+
+        }
+
         super.onActivityResult(requestCode, resultCode, data);
-        /* Comprobar a qué activity respondemos
-        *  Posibles respuestas:
-        *      1. Nuevo mapa + resultado ok
-        *      2. Nuevo mapa + resultado cancel
-        */
     }
 
     /**
@@ -122,143 +127,111 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         startActivity(intent);
     }
 
+    private void login(){
+        requestSignIn();
+    }
 
     private void exportar(){
-        apiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this, this)
-                .addApi(Drive.API)
-                .addScope(Drive.SCOPE_FILE)
-                .build();
+        // 1- Hacer el requestSignIn para logarse
+        // requestSignIn();
+        // 2- Comprobar si existe la carpeta WhereIsMyMap. Si existe, se advierte al usuario de que se tiene que borrar.
+        mDriveServiceHelper.queryFiles()
+                .addOnSuccessListener(fileList -> {
+                    for (java.io.File file : fileList.getFiles()) {
+                        if(file.getName().equals(name))
+                            mDriveServiceHelper.deleteFolderFile(file.getId()).addOnSuccessListener(v-> Log.d(TAG, "removed file "+file.getName())).
+                                    addOnFailureListener(v-> Log.d(TAG, "File was not removed: "+file.getName()));
+                    }
+                })
+                .addOnFailureListener(exception -> Log.e(TAG, "Unable to query files.", exception));
 
-        // Crear una carpeta ("whereismymap" es el nombre de la carpeta):
-        MetadataChangeSet changeSet =
-                new MetadataChangeSet.Builder()
-                        .setTitle("whereismymap")
+        // 3-   Si el usuario está de acuerdo, borrar la carpeta WhereIsMyMap
+        // 4- Crear la carpeta WhereIsMyMap
+
+        if (mDriveServiceHelper != null) {
+            Log.i(TAG, "CreateFolder");
+            mDriveServiceHelper.createFolder()
+                    .addOnSuccessListener(fileId -> readFile(fileId))
+                    .addOnFailureListener(exception ->
+                            Log.e(TAG, "Couldn't create folder.", exception));
+        }
+        // 5- Subir todos los ficheros de imágenes
+        // 6- Subir la Base de Datos
+
+    }
+
+    private void requestSignIn() {
+        Log.d(TAG, "Requesting sign-in");
+
+        GoogleSignInOptions signInOptions =
+                new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                        .requestEmail()
+                        .requestScopes(new Scope(DriveScopes.DRIVE_FILE))
                         .build();
-        // Obtenemos una referencia de la localización donde vamos a crear la carpeta. En este caso, la carpeta raíz.
-        DriveFolder folder = Drive.DriveApi.getRootFolder(apiClient);
+        GoogleSignInClient client = GoogleSignIn.getClient(this, signInOptions);
 
-        folder.createFolder(apiClient, changeSet).setResultCallback(
-                new ResultCallback<DriveFolder.DriveFolderResult>() {
-                    @Override
-                    public void onResult(DriveFolder.DriveFolderResult result) {
-                        if (result.getStatus().isSuccess())
-                            Log.i("exportar", "Carpeta creada con ID = " + result.getDriveFolder().getDriveId());
-                        else
-                            Log.e("exportar", "Error al crear carpeta");
-                    }
-                });
+        // The result of the sign-in Intent is handled in onActivityResult.
+        startActivityForResult(client.getSignInIntent(), REQUEST_CODE_SIGN_IN);
+    }
 
+    private void handleSignInResult(Intent result) {
+        GoogleSignIn.getSignedInAccountFromIntent(result)
+                .addOnSuccessListener(googleAccount -> {
+                    Log.d(TAG, "Conectado como " + googleAccount.getEmail());
 
-        // crear fichero
-        Drive.DriveApi.newDriveContents(apiClient)
-                .setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
-                    @Override
-                    public void onResult(DriveApi.DriveContentsResult result) {
-                        if (result.getStatus().isSuccess()) {
+                    // Use the authenticated account to sign in to the Drive service.
+                    GoogleAccountCredential credential =
+                            GoogleAccountCredential.usingOAuth2(
+                                    this, Collections.singleton(DriveScopes.DRIVE_FILE));
+                    credential.setSelectedAccount(googleAccount.getAccount());
+                    Drive googleDriveService =
+                            new Drive.Builder(
+                                    AndroidHttp.newCompatibleTransport(),
+                                    new GsonFactory(),
+                                    credential)
+                                    .setApplicationName("WhereIsMyMap")
+                                    .build();
 
-                            writeSampleText(result.getDriveContents());
+                    // The DriveServiceHelper encapsulates all REST API and SAF functionality.
+                    // Its instantiation is required before handling any onClick actions.
+                    mDriveServiceHelper = new DriveServiceHelper(googleDriveService);
+                })
+                .addOnFailureListener(exception -> Log.e(TAG, "Imposible conectar", exception));
+    }
 
-                            MetadataChangeSet changeSet =
-                                    new MetadataChangeSet.Builder()
-                                            .setTitle("ficheroNuevo")
-                                            .setMimeType("text/plain")
-                                            .build();
+    public void CreateFile(View view){
+        Log.e(TAG, "CreateFile");
+        if (mDriveServiceHelper != null) {
+            Log.d(TAG, "Creating a file.");
 
-                            //Opción 1: Directorio raíz
-                            DriveFolder folder = Drive.DriveApi.getRootFolder(apiClient);
-
-                            //Opción 2: Otra carpeta distinta al directorio raiz
-                            //DriveFolder folder =
-                            //    DriveId.decodeFromString("DriveId:CAESABjKGSD6wKnM7lQoAQ==").asDriveFolder();
-
-                            folder.createFile(apiClient, changeSet, result.getDriveContents())
-                                    .setResultCallback(new ResultCallback<DriveFolder.DriveFileResult>() {
-                                        @Override
-                                        public void onResult(DriveFolder.DriveFileResult result) {
-                                            if (result.getStatus().isSuccess()) {
-                                                Log.i("exportar", "Fichero creado con ID = " + result.getDriveFile().getDriveId());
-                                            } else {
-                                                Log.e("exportar", "Error al crear el fichero");
-                                            }
-                                        }
-                                    });
-                        } else {
-                            Log.e("exportar", "Error al crear DriveContents");
-                        }
-                    }
-                });
+            mDriveServiceHelper.createFile()
+                    .addOnSuccessListener(fileId -> readFile(fileId))
+                    .addOnFailureListener(exception ->
+                            Log.e(TAG, "Couldn't create file.", exception));
+        }
 
 
     }
 
-    private void writeSampleText(DriveContents driveContents) {
-        OutputStream outputStream = driveContents.getOutputStream();
-        Writer writer = new OutputStreamWriter(outputStream);
+    private void readFile(String fileId) {
+        if (mDriveServiceHelper != null) {
+            Log.d(TAG, "Reading file " + fileId);
 
-        try {
-            writer.write("Esto es un texto de prueba!");
-            writer.close();
-        } catch (IOException e) {
-            Log.e("writeSampleText", "Error al escribir en el fichero: " + e.getMessage());
+            /*
+            mDriveServiceHelper.readFile(fileId)
+                    .addOnSuccessListener(nameAndContent -> {
+                        String name = nameAndContent.first;
+                        String content = nameAndContent.second;
+
+                        mFileTitleEditText.setText(name);
+                        mDocContentEditText.setText(content);
+
+                        setReadWriteMode(fileId);
+                    })
+                    .addOnFailureListener(exception ->
+                            Log.e(TAG, "Couldn't read file.", exception));
+*/
         }
     }
 
-    private void copyImage(DriveContents driveContents){
-        //Defino la ruta donde busco los ficheros
-        File f = ((Aplication) getApplication()).imgsPath;
-        //Creo el array de tipo File con el contenido de la carpeta
-        File[] files = f.listFiles();
-        String nameFile = files[0].getName();
-
-
-
-        apiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this, this)
-                .addApi(Drive.API)
-                .addScope(Drive.SCOPE_FILE)
-                .build();
-
-
-        // Obtenemos una referencia de la localización donde vamos a crear la carpeta. En este caso, la carpeta raíz.
-        DriveFolder folder = Drive.DriveApi.getRootFolder(apiClient);
-
-
-
-        // write content to DriveContents
-        OutputStream outputStream = driveContents.getOutputStream();
-        // Write the bitmap data from it.
-        MetadataChangeSet metadataChangeSet = new MetadataChangeSet.Builder()
-                .setMimeType("image/jpeg").setTitle(nameFile)
-                .build();
-        Bitmap image = BitmapFactory.decodeFile(f + "/" + nameFile);
-        ByteArrayOutputStream bitmapStream = new ByteArrayOutputStream();
-        image.compress(Bitmap.CompressFormat.JPEG, 80, bitmapStream);
-        try {
-            outputStream.write(bitmapStream.toByteArray());
-        } catch (IOException e1) {
-            Log.i("E", "Unable to write file contents.");
-        }
-        image.recycle();
-        outputStream = null;
-        String title = "noisy";
-
-        Log.i("E", "Creating new pic on Drive (" + title + ")");
-        folder.createFile(apiClient, metadataChangeSet, driveContents)
-                .setResultCallback(new ResultCallback<DriveFolder.DriveFileResult>() {
-                    @Override
-                    public void onResult(DriveFolder.DriveFileResult result) {
-                        if (result.getStatus().isSuccess()) {
-                            Log.i("exportar", "Imagen creada con ID = " + result.getDriveFile().getDriveId());
-                        } else {
-                            Log.e("exportar", "Error al crear la imagen");
-                        }
-                    }
-                });
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.e("MainActivity:", "OnConnectionFailed: " + connectionResult);
-    }
 }
