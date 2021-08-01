@@ -18,16 +18,22 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.Scope;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.http.FileContent;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.pgsanchez.whereismymap.R;
+import com.pgsanchez.whereismymap.domain.Map;
 import com.pgsanchez.whereismymap.use_cases.UseCaseDB;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.Callable;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -137,8 +143,8 @@ public class MainActivity extends AppCompatActivity {
         // 2- Comprobar si existe la carpeta WhereIsMyMap. Si existe, se advierte al usuario de que se tiene que borrar.
         mDriveServiceHelper.queryFiles()
                 .addOnSuccessListener(fileList -> {
-                    for (java.io.File file : fileList.getFiles()) {
-                        if(file.getName().equals(name))
+                    for (com.google.api.services.drive.model.File file : fileList.getFiles()) {
+                        if(file.getName().equals("WhereIsMyMap"))
                             mDriveServiceHelper.deleteFolderFile(file.getId()).addOnSuccessListener(v-> Log.d(TAG, "removed file "+file.getName())).
                                     addOnFailureListener(v-> Log.d(TAG, "File was not removed: "+file.getName()));
                     }
@@ -150,14 +156,26 @@ public class MainActivity extends AppCompatActivity {
 
         if (mDriveServiceHelper != null) {
             Log.i(TAG, "CreateFolder");
-            mDriveServiceHelper.createFolder()
-                    .addOnSuccessListener(fileId -> readFile(fileId))
+            Task<String> folderId = mDriveServiceHelper.createFolder()
+                    .addOnSuccessListener(fileId -> subirFicheros(fileId))
                     .addOnFailureListener(exception ->
                             Log.e(TAG, "Couldn't create folder.", exception));
+
+            // 5- Subir todos los ficheros de imágenes
+
         }
-        // 5- Subir todos los ficheros de imágenes
+
+
         // 6- Subir la Base de Datos
 
+    }
+
+    private void subirFicheros(String folderId){
+        for (Map map: useCaseDB.getAllMaps()) {
+            File file = new File(((Aplication) getApplication()).imgsPath + "/" + map.getImgFileName());
+            mDriveServiceHelper.uploadFile(file, "image/jpeg", folderId);
+            Log.e(TAG, "Subiendo fichero " + map.getImgFileName());
+        }
     }
 
     private void requestSignIn() {
@@ -199,19 +217,7 @@ public class MainActivity extends AppCompatActivity {
                 .addOnFailureListener(exception -> Log.e(TAG, "Imposible conectar", exception));
     }
 
-    public void CreateFile(View view){
-        Log.e(TAG, "CreateFile");
-        if (mDriveServiceHelper != null) {
-            Log.d(TAG, "Creating a file.");
 
-            mDriveServiceHelper.createFile()
-                    .addOnSuccessListener(fileId -> readFile(fileId))
-                    .addOnFailureListener(exception ->
-                            Log.e(TAG, "Couldn't create file.", exception));
-        }
-
-
-    }
 
     private void readFile(String fileId) {
         if (mDriveServiceHelper != null) {
@@ -233,5 +239,6 @@ public class MainActivity extends AppCompatActivity {
 */
         }
     }
+
 
 }
