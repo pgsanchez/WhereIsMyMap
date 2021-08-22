@@ -116,6 +116,12 @@ public class DriveServiceHelper {
                 mDriveService.files().list().setSpaces("drive").execute());
     }
 
+    public FileList queryFilesSync() throws IOException {
+        return mDriveService.files().list()
+                .setQ("mimeType = 'application/vnd.google-apps.folder' and title = 'WhereIsMyMap'")
+                .setSpaces("drive").execute();
+    }
+
     /**
      * Returns an {@link Intent} for opening the Storage Access Framework file picker.
      */

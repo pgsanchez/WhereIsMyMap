@@ -26,11 +26,13 @@ import com.google.api.client.http.FileContent;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
+import com.google.api.services.drive.model.FileList;
 import com.pgsanchez.whereismymap.R;
 import com.pgsanchez.whereismymap.domain.Map;
 import com.pgsanchez.whereismymap.use_cases.UseCaseDB;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -68,7 +70,11 @@ public class MainActivity extends AppCompatActivity {
                 login();
                 break;
             case R.id.export_option:
-                exportar();
+                try {
+                    exportar2();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 break;
             case R.id.import_option:
                 break;
@@ -137,6 +143,16 @@ public class MainActivity extends AppCompatActivity {
         requestSignIn();
     }
 
+    private void exportar2() throws IOException {
+        // 2- Comprobar (en este mismo hilo) si existe la carpeta WhereIsMyMap
+        FileList lista = mDriveServiceHelper.queryFilesSync();
+        for (com.google.api.services.drive.model.File file : lista.getFiles()) {
+            Log.i("exportar2 = ", file.getName());
+
+        }
+
+        // Tratar de borrar dicha carpeta
+    }
     private void exportar(){
         // 1- Hacer el requestSignIn para logarse
         // requestSignIn();
